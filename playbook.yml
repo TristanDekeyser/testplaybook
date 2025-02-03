@@ -1,0 +1,31 @@
+---
+- name: Eenvoudig test playbook
+  hosts: all
+  become: yes
+  tasks:
+
+    - name: Controleer of de host bereikbaar is (ping)
+      ansible.builtin.ping:
+
+    - name: Controleer of bestand bestaat
+      ansible.builtin.stat:
+        path: /tmp/testfile.txt
+      register: file_status
+
+    - name: Toon melding als bestand bestaat
+      ansible.builtin.debug:
+        msg: "Bestand bestaat al!"
+      when: file_status.stat.exists
+
+    - name: Maak een testbestand als het niet bestaat
+      ansible.builtin.copy:
+        content: "Dit is een testbestand."
+        dest: /tmp/testfile.txt
+        mode: '0644'
+      when: not file_status.stat.exists
+
+    - name: Verander de hostname
+      ansible.builtin.hostname:
+        name: "mijn-server"
+      when: ansible_hostname != "mijn-server"
+
