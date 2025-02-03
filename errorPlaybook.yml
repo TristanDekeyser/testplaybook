@@ -1,0 +1,41 @@
+---
+- name: Automatisch inventory ophalen en variabelen aanpassen
+  hosts: localhost
+  become: yes
+  tasks:
+
+    - name: Download de inventory file van GitHub
+      ansible.builtin.get_url:
+        url: "https://raw.githubusercontent.com/TristanDekeyser/testplaybook/main/inventory.yml"
+        dest: "/tmp/inventory.yml"
+      register: download_status
+
+    - name: Toon de status van de download
+      ansible.builtin.debug:
+        msg: "Download status: {{ download_status }}"
+
+    - name: Lees de inhoud van de inventory file
+      ansible.builtin.set_fact:
+        inventory_content: "{{ lookup('file', '/tmp/inventory.yml') }}"
+
+    - name: Parse de inventory file (example for extracting variables)
+      ansible.builtin.set_fact:
+        nieuwe_hostname: "{{ lookup('file', '/tmp/inventory.yml') | regex_search('nieuwe_hostname: (\\S+)', '\\1') }}"
+
+    - name: Laat de variabele nieuwe_hostname zien
+      ansible.builtin.debug:
+        msg: "Nieuwe hostname is: {{ nieuwe_hostname }}"
+
+    - name: Controleer of de hostname bestaat in de inventory file
+      ansible.builtin.debug:
+        msg: "Inventory file bevat nieuwe_hostname: {{ nieuwe_hostname }}"
+      
+    - name: Maak een variabele groep aan bij een fout
+      ansible.builtin.set_fact:
+        error_group: "{{ error_group | default([]) + [nieuwe_hostname] }}"
+      when: download_status.failed
+
+    - name: Toon de variabele groep bij fout
+      ansible.builtin.debug:
+        msg: "De nieuwe variabele groep bij fout: {{ error_group }}"
+
