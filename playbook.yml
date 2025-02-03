@@ -1,6 +1,6 @@
 ---
 - name: Eenvoudig test playbook
-  hosts: all
+  hosts: machines
   become: yes
   tasks:
 
@@ -26,6 +26,5 @@
 
     - name: Verander de hostname
       ansible.builtin.hostname:
-        name: "mijn-server"
-      when: ansible_hostname != "mijn-server"
+        name: "{{ nieuwe_hostname }}"
 
