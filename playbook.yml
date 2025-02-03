@@ -25,6 +25,7 @@
       when: not file_status.stat.exists
 
     - name: Verander de hostname
+      become: yes
       ansible.builtin.hostname:
         name: "{{ nieuwe_hostname }}"
 
