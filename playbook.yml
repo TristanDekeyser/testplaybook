@@ -26,6 +26,7 @@
 
     - name: Verander de hostname
       become: yes
+      become_user: root
       ansible.builtin.hostname:
         name: "{{ nieuwe_hostname }}"
 
