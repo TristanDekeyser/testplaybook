@@ -1,5 +1,8 @@
-[machines]
-192.168.242.157
+---
+machines:
+  - 192.168.242.157
 
-[all:vars]
-nieuwe_hostname: "serverke"
+all:
+  vars:
+    nieuwe_hostname: "serverke"
+
