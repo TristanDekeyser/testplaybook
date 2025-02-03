@@ -32,5 +32,5 @@
 
     - name: Toon de inhoud van de inventory file
       ansible.builtin.debug:
-        msg: "{{ lookup('file', '/inventory') }}"
+        msg: "{{ lookup('file', '/tmp/inventory') }}"
 
