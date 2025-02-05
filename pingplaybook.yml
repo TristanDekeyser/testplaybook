@@ -1,0 +1,7 @@
+---
+- name: Eenvoudig test playbook
+  hosts: machines
+  become: yes
+  tasks:
+    - name: Controleer of de host bereikbaar is (ping)
+      ansible.builtin.ping:
