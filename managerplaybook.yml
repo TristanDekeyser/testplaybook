@@ -24,3 +24,11 @@
         - name: Toon de output van Semaphore
           debug:
             msg: "De Semaphore Manager is uitgevoerd. Resultaat: {{ semaphore_output }}"
+        - name: Verwijder het hosts bestand van de doelserver
+          ansible.builtin.file:
+            path: hosts
+            state: absent
+        - name: Verwijder het variabelen bestand van de doelserver
+          ansible.builtin.file:
+            path: vars.yml
+            state: absent
