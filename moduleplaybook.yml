@@ -1,5 +1,5 @@
 - name: Voer ls uit met custom module
-  my_custom_module: # Dit is je aangepaste module
+  module: # Dit is je aangepaste module
   register: ls_output # Registreer de uitvoer in de variabele ls_output
 
 - name: Toon output
