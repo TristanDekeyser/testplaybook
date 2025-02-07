@@ -15,7 +15,7 @@ def main():
             # Stuur de standaard uitvoer terug (als string)
             response = {
                 "message": "De ls opdracht is geslaagd.",
-                "output": result.stdout.strip()  # Verwijder extra nieuwe regels
+                "output": result.stdout()  # Verwijder extra nieuwe regels
             }
             module.exit_json(changed=False, result=response)
         else:
