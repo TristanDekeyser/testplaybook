@@ -15,16 +15,18 @@ def main():
             # Stuur de standaard uitvoer terug (als string)
             response = {
                 "message": "De ls opdracht is geslaagd.",
-                "output": result.stdout  # Verwijder extra nieuwe regels
+                "output": result.stdout.strip()  # Verwijder extra nieuwe regels
             }
-            module.exit_json(changed=False, result=response)
+            # Gebruik module.exit_json om de output correct te returnen
+            module.exit_json(changed=False, msg="De ls opdracht is geslaagd", output=result.stdout.strip())
         else:
             # Als er een fout is bij het uitvoeren van de 'ls' opdracht
             response = {
                 "message": "Er is een fout opgetreden bij het uitvoeren van 'ls'.",
                 "error": result.stderr.strip()  # Stuur de foutmelding als string
             }
-            module.fail_json(msg="Fout bij het uitvoeren van 'ls'.", result=response)
+            # Gebruik module.fail_json om foutinformatie door te geven
+            module.fail_json(msg="Fout bij het uitvoeren van 'ls'.", error=result.stderr.strip())
 
     except Exception as e:
         # Foutafhandelingsblok voor onverwachte fouten
