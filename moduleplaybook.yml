@@ -1,0 +1,12 @@
+- name: Test custom Python module
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Run mijn custom module
+      mijn_module:
+      register: output
+
+    - name: Toon output
+      debug:
+        msg: "{{ output.result.message }}"
+
