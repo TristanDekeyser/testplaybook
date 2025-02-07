@@ -4,8 +4,9 @@
   tasks:
     - name: Start het blok van taken en simuleer een fout
       block:
-        - name: Ping
-          ansible.builtin.ping:
+        - name: Voer een ongeldige opdracht uit (dit zal falen)
+          ansible.builtin.command:
+            cmd: nonexistent_command
           ignore_errors: no
       rescue:
         - name: Voer de Semaphore manager uit
