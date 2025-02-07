@@ -11,9 +11,12 @@ SEMAPHORE_URL = "http://192.168.242.133:3000/api"
 SEMAPHORE_TOKEN = "owozuup-zne7p-stkhhs3hdfr6efiyk1rh8okh_70bu="
 PROJECT_ID = 1
 
+# 🔹 Bepaal de absolute root van het Ansible-project (waar dit script staat)
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))  # Gaat één map omhoog vanuit 'library/'
+
 # 🔹 Bestanden in de repository
-inventory_path = "/inventori/hosts"
-env_path = "/inventori/host_vars/192.168.242.157/vars.yml"
+inventory_path = os.path.join(BASE_DIR, "inventori", "hosts")
+env_path = os.path.join(BASE_DIR, "inventori", "host_vars", "192.168.242.157", "vars.yml")
 
 
 def fetch_inventory():
