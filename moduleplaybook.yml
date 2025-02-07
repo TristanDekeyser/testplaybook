@@ -3,7 +3,7 @@
   gather_facts: no
   tasks:
     - name: Run mijn custom module
-      mijn_module:
+      module:
       register: output
 
     - name: Toon output
