@@ -27,7 +27,7 @@ def create_inventory(inventory_data):
     url = f"{SEMAPHORE_URL}/project/{PROJECT_ID}/inventory"
     headers = {"Authorization": f"Bearer {SEMAPHORE_TOKEN}", "Content-Type": "application/json"}
     payload = {
-        "name": "GitHub Inventory",
+        "name": "Backup Inventory",
         "project_id": PROJECT_ID,
         "inventory": inventory_data,
         "ssh_key_id": 2,
@@ -52,7 +52,7 @@ def create_environment(variable_data):
     url = f"{SEMAPHORE_URL}/project/{PROJECT_ID}/environment"
     headers = {"Authorization": f"Bearer {SEMAPHORE_TOKEN}", "Content-Type": "application/json"}
     payload = {
-        "name": "Test Environment",
+        "name": "Backup Environment",
         "project_id": PROJECT_ID,
         "password": "string",
         "json": json.dumps(variable_data),
