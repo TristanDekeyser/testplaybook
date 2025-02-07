@@ -1,0 +1,6 @@
+---
+- name: Beheer Semaphore configuratie
+  hosts: localhost
+  tasks:
+    - name: Voer de Semaphore manager uit
+      semaphore_manager:
