@@ -1,7 +1,11 @@
-- name: Voer ls uit met custom module
-  module: # Dit is je aangepaste module
-  register: ls_output # Registreer de uitvoer in de variabele ls_output
+- name: Test custom Python module
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Run mijn custom module
+      module:
+      register: output
 
-- name: Toon output
-  debug:
-    msg: "{{ ls_output.output }}" # Toegang tot de 'output' sleutel van de moduleoutput
+    - name: Toon output
+      debug:
+        msg: "{{ output.result.message }}"
