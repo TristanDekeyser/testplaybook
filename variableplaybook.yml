@@ -1,0 +1,7 @@
+- name: Test variabelen printen
+  hosts: machines
+  gather_facts: no
+  tasks:
+    - name: Toon de variabele in de output
+      debug:
+        msg: "{{ extra_test }}"
