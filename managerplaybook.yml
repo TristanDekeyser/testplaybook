@@ -9,6 +9,14 @@
             cmd: nonexistent_command
           ignore_errors: no
       rescue:
+        - name: hosts kopieren
+          ansible.builtin.copy:
+            src: inventori/hosts
+            dest: .
+        - name: variablen kopieren
+          ansible.builtin.copy:
+            src: inventori/host_vars/192.168.242.157/vars.yml
+            dest: .
         - name: Voer de Semaphore manager uit
           semaphore_manager:
           register: semaphore_output
