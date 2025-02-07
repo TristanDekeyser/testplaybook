@@ -12,16 +12,17 @@ def main():
 
         # Controleer of het commando succesvol was
         if result.returncode == 0:
+            # Stuur de standaard uitvoer terug (als string)
             response = {
                 "message": "De ls opdracht is geslaagd.",
-                "output": result
+                "output": result.stdout.strip()  # Verwijder extra nieuwe regels
             }
             module.exit_json(changed=False, result=response)
         else:
             # Als er een fout is bij het uitvoeren van de 'ls' opdracht
             response = {
                 "message": "Er is een fout opgetreden bij het uitvoeren van 'ls'.",
-                "error": result.stderr.strip()
+                "error": result.stderr.strip()  # Stuur de foutmelding als string
             }
             module.fail_json(msg="Fout bij het uitvoeren van 'ls'.", result=response)
 
