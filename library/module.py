@@ -14,7 +14,7 @@ def main():
         if result.returncode == 0:
             response = {
                 "message": "De ls opdracht is geslaagd.",
-                "output": result.stdout.strip()  # Verwijder extra nieuwe regels
+                "output": result
             }
             module.exit_json(changed=False, result=response)
         else:
