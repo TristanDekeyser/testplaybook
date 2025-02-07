@@ -8,4 +8,4 @@
 
     - name: Toon output
       debug:
-        msg: "{{ output.result.message }}"
+        msg: "{{ output }}"
