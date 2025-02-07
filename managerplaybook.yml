@@ -1,6 +1,19 @@
----
 - name: Beheer Semaphore configuratie
-  hosts: localhost
+  hosts: machines
+  gather_facts: no
   tasks:
-    - name: Voer de Semaphore manager uit
-      semaphore_manager:
+    - name: Start het blok van taken en simuleer een fout
+      block:
+        - name: Ping
+          ansible.builtin.ping:
+          ignore_errors: no
+
+    - name: Rescateer de taak als deze faalt
+      rescue:
+        - name: Voer de Semaphore manager uit
+          semaphore_manager:
+          register: semaphore_output
+
+        - name: Toon de output van Semaphore
+          debug:
+            msg: "De Semaphore Manager is uitgevoerd. Resultaat: {{ semaphore_output }}"
