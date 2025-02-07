@@ -1,5 +1,5 @@
 - name: Test custom Python module
-  hosts: machines
+  hosts: localhost
   gather_facts: no
   tasks:
     - name: Run mijn custom module
