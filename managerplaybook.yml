@@ -7,8 +7,6 @@
         - name: Ping
           ansible.builtin.ping:
           ignore_errors: no
-
-    - name: Rescateer de taak als deze faalt
       rescue:
         - name: Voer de Semaphore manager uit
           semaphore_manager:
