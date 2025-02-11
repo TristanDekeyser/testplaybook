@@ -6,7 +6,7 @@ import yaml
 
 # 🔹 Semaphore API Configuratie
 SEMAPHORE_URL = "http://192.168.242.133:3000/api"
-SEMAPHORE_TOKEN = "owozuup-zne7p-stkhhs3hdfr6efiyk1rh8okh_70bu="
+SEMAPHORE_TOKEN = "ybv3vzutqwya30hg2rn_q5xgobvloclj2_u8x8k4kos="
 PROJECT_ID = 1
 
 def create_inventory(inventory_data):
