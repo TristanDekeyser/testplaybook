@@ -1,6 +1,6 @@
 ---
 - name: Playbook met foutafhandeling
-  hosts: machines
+  hosts: 192.168.242.157
   gather_facts: yes
   run_once: true
 
