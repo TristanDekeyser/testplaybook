@@ -11,7 +11,7 @@
       ignore_errors: yes
       register: command_result
 
-    - name: Verzamel alleen de variabelen gedefinieerd in vars.yml
+    - name: Verzamel alle variabelen uit hostvars
       run_once: true
       set_fact:
         failed_hosts: "{{ ansible_play_hosts_all }}"
@@ -27,7 +27,7 @@
           - hostvars
           - play_hosts
           - role_names
-        _hostvars: "{{ hostvars[inventory_hostname].keys() }}"
+        _hostvars: "{{ hostvars[inventory_hostname] | dict2items | map(attribute='key') | list }}"
         _my_vars: "{{ vars.keys() |
           difference(_hostvars) |
           difference(_special_vars) |
