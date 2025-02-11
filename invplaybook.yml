@@ -1,27 +1,35 @@
 ---
-- name: Playbook met foutafhandeling
+- name: Playbook om alleen de variabelen uit vars.yml te tonen
   hosts: machines
-  gather_facts: no
+  gather_facts: yes
   vars_files:
-    - vars.yml # Zorg dat de variabelenfile correct wordt ingeladen
+    - vars.yml
 
   tasks:
-    - name: Simuleer een fout
-      command: /bin/false
-      ignore_errors: yes
-      register: command_result
-
-    - name: Verzamel alleen de variabelen gedefinieerd in vars.yml
-      run_once: true
-      set_fact:
-        failed_hosts: "{{ ansible_play_hosts_all }}"
-        custom_vars: "{{ hostvars[inventory_hostname] | to_nice_json }}"
-      when: command_result.rc != 0
-
-    - name: Toon opgeslagen informatie
-      run_once: true
+    - name: Toon alleen de variabelen die in vars.yml zijn gedefinieerd
       debug:
-        msg:
-          - "Mislukte hosts: {{ failed_hosts }}"
-          - "Custom variabelen uit vars.yml: {{ custom_vars }}"
-      when: command_result.rc != 0
+        msg: |
+          {% set excluded_keys = [
+            'ansible_facts', 
+            'ansible_verbosity', 
+            'ansible_check_mode', 
+            'ansible_diff_mode', 
+            'ansible_inventory_sources', 
+            'ansible_playbook_python', 
+            'ansible_run_tags', 
+            'ansible_skip_tags', 
+            'ansible_version', 
+            'command_result', 
+            'groups', 
+            'inventory_file', 
+            'inventory_dir', 
+            'inventory_hostname', 
+            'inventory_hostname_short', 
+            'playbook_dir', 
+            'semaphore_vars', 
+            'omit'
+          ] %}
+
+          {% set custom_vars = hostvars[inventory_hostname] | dictsort %}
+          {% set filtered_vars = custom_vars | selectattr(0, 'not in', excluded_keys) | list %}
+          {{ filtered_vars | to_nice_json }}
