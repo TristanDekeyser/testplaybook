@@ -21,5 +21,5 @@
       debug:
         msg:
           - "Mislukte hosts: {{ ansible_play_hosts_all }}"
-          - "Gefilterde variabelen: {{ plugin_output }}"
+          - "Gefilterde variabelen: {{ plugin_output.stdout | from_json | dict2items | map(attribute='value') | first }}"
       when: command_result.rc != 0
