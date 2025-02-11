@@ -1,0 +1,36 @@
+---
+- name: Beheer Semaphore configuratie zonder bestandskopieën
+  hosts: machines
+  gather_facts: no
+
+  tasks:
+    - name: Simuleer een fout
+      command: /bin/false
+      ignore_errors: yes
+      register: command_result
+
+    - name: Stuur alle hostvariabelen naar de plugin voor filtering
+      run_once: true
+      filter_hostvars:
+        hostvars: "{{ hostvars | to_json }}"
+      register: plugin_output
+      when: command_result.rc != 0
+
+    - name: Toon gefilterde variabelen
+      run_once: true
+      debug:
+        msg:
+          - "Mislukte hosts: {{ ansible_play_hosts_all }}"
+          - "Gefilterde variabelen: {{ plugin_output }}"
+      when: command_result.rc != 0
+
+    - name: Voer de Semaphore manager uit met gefilterde variabelen
+      semaphore:
+        filtered_vars: "{{ plugin_output.filtered_vars }}"
+      register: semaphore_output
+      when: command_result.rc != 0
+
+    - name: Toon de output van Semaphore
+      debug:
+        msg: "De Semaphore Manager is uitgevoerd. Resultaat: {{ semaphore_output }}"
+      when: command_result.rc != 0
