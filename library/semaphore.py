@@ -1,17 +1,13 @@
-#!/usr/bin/python
-import json
+#!/usr/bin/python3
 from ansible.module_utils.basic import AnsibleModule
+import json
 import requests
+import yaml
 
 # 🔹 Semaphore API Configuratie
 SEMAPHORE_URL = "http://192.168.242.133:3000/api"
 SEMAPHORE_TOKEN = "owozuup-zne7p-stkhhs3hdfr6efiyk1rh8okh_70bu="
 PROJECT_ID = 1
-
-# 🔹 Bestanden in de repository
-inventory_path = "hosts"
-env_path = "vars.yml"
-
 
 def create_inventory(inventory_data):
     """ Maakt de inventory aan in Semaphore en retourneert de ID """
@@ -31,7 +27,6 @@ def create_inventory(inventory_data):
         return response.json().get("id")
     return None
 
-
 def create_environment(variable_data):
     """ Maakt een environment aan in Semaphore en retourneert de ID """
     url = f"{SEMAPHORE_URL}/project/{PROJECT_ID}/environment"
@@ -49,7 +44,6 @@ def create_environment(variable_data):
     if response.status_code in [200, 201]:
         return response.json().get("id")
     return None
-
 
 def create_template(inventory_id, environment_id):
     """ Maakt een template aan in Semaphore """
@@ -72,35 +66,41 @@ def create_template(inventory_id, environment_id):
     response = requests.post(url, headers=headers, json=payload)
     return response.status_code in [200, 201]
 
+def run_semaphore(inventory_vars, environment_vars):
+    """ Verwerkt de data en maakt resources aan in Semaphore """
+    # 1. Maak de inventory aan in Semaphore
+    inventory_id = create_inventory(inventory_vars)
+    if not inventory_id:
+        raise Exception("Fout bij aanmaken van inventory!")
+    
+    # 2. Maak de environment aan in Semaphore
+    environment_id = create_environment(environment_vars)
+    if not environment_id:
+        raise Exception("Fout bij aanmaken van environment!")
+
+    # 3. Maak de template aan in Semaphore
+    if not create_template(inventory_id, environment_id):
+        raise Exception("Fout bij aanmaken van template!")
+
+    return "Semaphore resources succesvol aangemaakt!"
 
 def main():
     module = AnsibleModule(
         argument_spec={
-            'filtered_vars': {'type': 'dict', 'required': True}
+            'inventory': {'type': 'list', 'required': True},
+            'environment': {'type': 'dict', 'required': True}
         }
     )
 
-    filtered_vars = module.params['filtered_vars']
-    
-    # Log de gefilterde variabelen om te controleren of ze correct zijn
-    module.debug(msg=f"Gefilterde variabelen: {filtered_vars}")
+    inventory_vars = module.params['inventory']
+    environment_vars = module.params['environment']
 
-    # Maak de inventory aan op basis van de gefilterde variabelen
-    inventory_id = create_inventory(filtered_vars)
-    if not inventory_id:
-        module.fail_json(msg="Fout bij aanmaken van inventory!")
+    try:
+        result = run_semaphore(inventory_vars, environment_vars)
+        module.exit_json(changed=True, msg=result)
 
-    # Maak de environment aan met de gefilterde variabelen
-    environment_id = create_environment(filtered_vars)
-    if not environment_id:
-        module.fail_json(msg="Fout bij aanmaken van environment!")
-
-    # Maak de template aan in Semaphore
-    if not create_template(inventory_id, environment_id):
-        module.fail_json(msg="Fout bij aanmaken van template!")
-
-    module.exit_json(changed=True, msg="Semaphore resources succesvol aangemaakt!")
-
+    except Exception as e:
+        module.fail_json(msg=f"Fout: {str(e)}")
 
 if __name__ == '__main__':
     main()

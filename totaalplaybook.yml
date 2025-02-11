@@ -24,9 +24,22 @@
           - "Gefilterde variabelen: {{ plugin_output }}"
       when: command_result.rc != 0
 
-    - name: Voer de Semaphore manager uit met gefilterde variabelen
+    - name: Maak de inventory variabele
+      run_once: true
+      set_fact:
+        inventory_vars: "{{ ansible_play_hosts_all }}"
+      when: command_result.rc != 0
+
+    - name: Maak de environment variabele
+      run_once: true
+      set_fact:
+        environment_vars: "{{ plugin_output.filtered_vars }}"
+      when: command_result.rc != 0
+
+    - name: Voer de Semaphore manager uit met aparte inventory en environment variabelen
       semaphore:
-        filtered_vars: "{{ plugin_output.filtered_vars }}"
+        inventory: "{{ inventory_vars }}"
+        environment: "{{ environment_vars }}"
       register: semaphore_output
       when: command_result.rc != 0
 
