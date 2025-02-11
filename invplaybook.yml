@@ -1,8 +1,10 @@
 ---
 - name: Playbook met foutafhandeling
-  hosts: machines
+  hosts: 192.168.242.157
   gather_facts: yes
   run_once: true
+  vars_files:
+    - vars.yml # Zorg dat deze file bestaat en correct wordt ingeladen
 
   tasks:
     - name: Simuleer een fout
@@ -10,15 +12,15 @@
       ignore_errors: yes
       register: command_result
 
-    - name: Verzamel hosts en environment variabelen
+    - name: Verzamel alleen variabelen uit vars.yml
       set_fact:
         failed_hosts: "{{ ansible_play_hosts_all }}"
-        env_vars: "{{ vars }}"
+        custom_vars: "{{ vars | dict2items | selectattr('key', 'in', ['nieuwe_hostname', 'extra_test']) | items2dict }}"
       when: command_result.rc != 0
 
     - name: Toon opgeslagen informatie
       debug:
         msg:
           - "Mislukte hosts: {{ failed_hosts }}"
-          - "Environment variabelen: {{ env_vars }}"
+          - "Custom variabelen uit vars.yml: {{ custom_vars }}"
       when: command_result.rc != 0
