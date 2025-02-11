@@ -1,7 +1,23 @@
-- name: Print hosts in playbook
-  hosts: machines
-  gather_facts: false
+---
+- name: Playbook met foutafhandeling
+  hosts: all
+  gather_facts: yes
+
   tasks:
-    - name: Print hostname
+    - name: Simuleer een fout
+      command: /bin/false
+      ignore_errors: yes
+      register: command_result
+
+    - name: Verzamel hosts en environment variabelen
+      set_fact:
+        failed_hosts: "{{ ansible_play_hosts_all }}"
+        env_vars: "{{ ansible_env }}"
+      when: command_result.rc != 0
+
+    - name: Toon opgeslagen informatie
       debug:
-        msg: "Running on {{ inventory_hostname }}"
+        msg:
+          - "Mislukte hosts: {{ failed_hosts }}"
+          - "Environment variabelen: {{ env_vars }}"
+      when: command_result.rc != 0
