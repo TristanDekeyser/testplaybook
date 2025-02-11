@@ -19,5 +19,5 @@
       debug:
         msg:
           - "Mislukte hosts: {{ failed_hosts }}"
-          # - "Environment variabelen: {{ env_vars }}"
+          - "Environment variabelen: {{ env_vars }}"
       when: command_result.rc != 0
