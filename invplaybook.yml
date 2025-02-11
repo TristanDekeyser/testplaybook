@@ -1,6 +1,6 @@
 ---
 - name: Playbook met foutafhandeling
-  hosts: machines
+  hosts: localhost
   gather_facts: yes
   run_once: true
 
@@ -13,12 +13,12 @@
     - name: Verzamel hosts en environment variabelen
       set_fact:
         failed_hosts: "{{ ansible_play_hosts_all }}"
-        env_vars: "{{ hostvars[inventory_hostname].ansible_env }}"
+        env_vars: "{{ ansible_env | to_nice_json }}"
       when: command_result.rc != 0
 
     - name: Toon opgeslagen informatie
       debug:
         msg:
           - "Mislukte hosts: {{ failed_hosts }}"
-          - "Environment variabelen: {{ env_vars }}"
+          - "Environment variabelen:\n{{ env_vars }}"
       when: command_result.rc != 0
