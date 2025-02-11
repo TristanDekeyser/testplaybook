@@ -1,7 +1,7 @@
 ---
 - name: Playbook met foutafhandeling
   hosts: machines
-  gather_facts: yes
+  gather_facts: no
   vars_files:
     - vars.yml # Zorg dat de variabelenfile correct wordt ingeladen
 
