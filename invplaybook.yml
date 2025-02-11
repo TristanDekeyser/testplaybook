@@ -1,6 +1,6 @@
 ---
 - name: Playbook met foutafhandeling
-  hosts: localhost
+  hosts: machines
   gather_facts: yes
   run_once: true
 
@@ -21,4 +21,4 @@
         msg:
           - "Mislukte hosts: {{ failed_hosts }}"
           - "Environment variabelen: {{ env_vars }}"
-      when: co
+      when: command_result.rc != 0
