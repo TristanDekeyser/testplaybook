@@ -1,0 +1,7 @@
+- name: Print hosts in playbook
+  hosts: machines
+  gather_facts: false
+  tasks:
+    - name: Print hostname
+      debug:
+        msg: "Running on {{ inventory_hostname }}"
