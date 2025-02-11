@@ -13,7 +13,7 @@
     - name: Verzamel hosts en environment variabelen
       set_fact:
         failed_hosts: "{{ ansible_play_hosts_all }}"
-        env_vars: "{{ vars.yml }}"
+        env_vars: "{{ vars }}"
       when: command_result.rc != 0
 
     - name: Toon opgeslagen informatie
