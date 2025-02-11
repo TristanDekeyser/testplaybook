@@ -82,6 +82,9 @@ def main():
 
     filtered_vars = module.params['filtered_vars']
     
+    # Log de gefilterde variabelen om te controleren of ze correct zijn
+    module.debug(msg=f"Gefilterde variabelen: {filtered_vars}")
+
     # Maak de inventory aan op basis van de gefilterde variabelen
     inventory_id = create_inventory(filtered_vars)
     if not inventory_id:
