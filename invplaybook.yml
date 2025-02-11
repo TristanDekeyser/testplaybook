@@ -1,9 +1,9 @@
 ---
 - name: Playbook met foutafhandeling
   hosts: machines
-  gather_facts: yes
+  gather_facts: no
   vars_files:
-    - vars.yml
+    - vars.yml # Zorg dat de variabelenfile correct wordt ingeladen
 
   tasks:
     - name: Simuleer een fout
@@ -11,21 +11,11 @@
       ignore_errors: yes
       register: command_result
 
-    - name: Verzamel variabelen tussen group_names en command_result
+    - name: Verzamel alleen de variabelen gedefinieerd in vars.yml
       run_once: true
       set_fact:
         failed_hosts: "{{ ansible_play_hosts_all }}"
-        custom_vars: >-
-          {{
-            hostvars[inventory_hostname] |
-            dict2items |
-            selectattr('key', 'search', '^.*$') |
-            selectattr('key', 'search', '^(?!command_result$).*') |
-            selectattr('key', 'search', '^(?!semaphore_vars$).*') |
-            selectattr('key', 'search', '^(?!playbook_dir$).*') |
-            selectattr('key', 'search', '^(?!groups$).*') |
-            items2dict
-          }}
+        custom_vars: "{{ hostvars[inventory_hostname] }}"
       when: command_result.rc != 0
 
     - name: Toon opgeslagen informatie
