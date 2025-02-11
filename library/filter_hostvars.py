@@ -19,9 +19,12 @@ def main():
     ]
 
     for host, vars_dict in hostvars.items():
-        # Alleen de custom variabelen behouden door de exclude_keys eruit te filteren
+        # Alleen de gewenste variabelen behouden
         custom_vars = {k: v for k, v in vars_dict.items() if k not in exclude_keys and not k.startswith("ansible_")}
-        filtered_vars[host] = custom_vars
+
+        # Host alleen toevoegen als er variabelen overblijven
+        if custom_vars:
+            filtered_vars[host] = custom_vars
 
     module.exit_json(changed=False, filtered_data=filtered_vars)
 
