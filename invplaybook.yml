@@ -1,5 +1,5 @@
 ---
-- name: Playbook met foutafhandeling
+- name: Playbook met foutafhandeling en Python plugin voor hostvars
   hosts: machines
   gather_facts: no
   vars_files:
@@ -18,10 +18,16 @@
         custom_vars: "{{ vars | to_nice_json }}"
       when: command_result.rc != 0
 
-    - name: Toon opgeslagen informatie
+    - name: Verzamel en filter de hostvars via de Python plugin
+      local_action:
+        module: filter_hostvars
+        hostvars_json: "{{ hostvars | to_json }}" # Geef de hostvars door aan de plugin
+      register: filtered_vars
+
+    - name: Toon de gefilterde variabelen
       run_once: true
       debug:
         msg:
           - "Mislukte hosts: {{ failed_hosts }}"
-          - "Custom variabelen uit vars.yml: {{ custom_vars }}"
+          - "Gefilterde variabelen uit hostvars: {{ filtered_vars.filtered_vars }}"
       when: command_result.rc != 0
