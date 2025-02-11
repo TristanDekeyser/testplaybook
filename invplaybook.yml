@@ -4,7 +4,7 @@
   gather_facts: yes
   run_once: true
   vars_files:
-    - vars.yml # Zorg dat deze file bestaat en correct wordt ingeladen
+    - vars.yml # Zorg dat de variabelenfile correct wordt ingeladen
 
   tasks:
     - name: Simuleer een fout
@@ -12,10 +12,10 @@
       ignore_errors: yes
       register: command_result
 
-    - name: Verzamel alleen variabelen uit vars.yml
+    - name: Verzamel alleen variabelen gedefinieerd in vars.yml
       set_fact:
         failed_hosts: "{{ ansible_play_hosts_all }}"
-        custom_vars: "{{ vars }}"
+        custom_vars: "{{ vars | dict2items | rejectattr('key', 'match', '^ansible_') | items2dict }}"
       when: command_result.rc != 0
 
     - name: Toon opgeslagen informatie
