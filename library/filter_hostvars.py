@@ -15,7 +15,7 @@ def main():
     exclude_keys = [
         "inventory_file", "inventory_dir", "inventory_hostname",
         "inventory_hostname_short", "group_names", "playbook_dir",
-        "groups", "omit", "command_result", "semaphore_vars"
+        "groups", "omit", "command_result", "semaphore_vars", "changed", "failed"
     ]
 
     for host, vars_dict in hostvars.items():
@@ -25,9 +25,6 @@ def main():
         # Host alleen toevoegen als er variabelen overblijven
         if custom_vars:
             filtered_vars[host] = custom_vars
-
-    # Geef nu alleen de pure gefilterde variabelen terug, zonder "changed" en "failed"
-    module.exit_json(**filtered_vars)
 
 if __name__ == '__main__':
     main()
