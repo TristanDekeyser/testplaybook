@@ -14,7 +14,7 @@ def main():
 
     for host, vars_dict in hostvars.items():
         # Behoud alleen de variabelen die NIET standaard in Ansible zitten
-        custom_vars = {k: v for k, v in vars_dict.items() if not k.startswith("ansible_", "changed")}
+        custom_vars = {k: v for k, v in vars_dict.items() if not k.startswith("ansible_")}
         filtered_vars[host] = custom_vars
 
     module.exit_json(changed=False, filtered_data=filtered_vars)
