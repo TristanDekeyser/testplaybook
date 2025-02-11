@@ -12,9 +12,15 @@ def main():
     hostvars = module.params['hostvars']
     filtered_vars = {}
 
+    exclude_keys = [
+        "inventory_file", "inventory_dir", "inventory_hostname",
+        "inventory_hostname_short", "group_names", "playbook_dir",
+        "groups", "omit", "command_result", "semaphore_vars"
+    ]
+
     for host, vars_dict in hostvars.items():
-        # Behoud alleen de variabelen die NIET standaard in Ansible zitten
-        custom_vars = {k: v for k, v in vars_dict.items() if not k.startswith("ansible_")}
+        # Alleen de custom variabelen behouden door de exclude_keys eruit te filteren
+        custom_vars = {k: v for k, v in vars_dict.items() if k not in exclude_keys and not k.startswith("ansible_")}
         filtered_vars[host] = custom_vars
 
     module.exit_json(changed=False, filtered_data=filtered_vars)
