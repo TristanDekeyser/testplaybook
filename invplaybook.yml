@@ -2,8 +2,6 @@
 - name: Playbook met foutafhandeling
   hosts: machines
   gather_facts: no
-  vars_files:
-    - vars.yml # Zorg dat de variabelenfile correct wordt ingeladen
 
   tasks:
     - name: Simuleer een fout
@@ -11,17 +9,17 @@
       ignore_errors: yes
       register: command_result
 
-    - name: Verzamel alle variabelen gedefinieerd in vars.yml
+    - name: Stuur alle hostvariabelen naar de plugin voor filtering
       run_once: true
-      set_fact:
-        failed_hosts: "{{ ansible_play_hosts_all }}"
-        custom_vars: "{{ hostvars | to_nice_json }}"
+      filter_hostvars:
+        hostvars: "{{ hostvars | to_json }}"
+      register: plugin_output
       when: command_result.rc != 0
 
-    - name: Toon opgeslagen informatie
+    - name: Toon gefilterde variabelen
       run_once: true
       debug:
         msg:
-          - "Mislukte hosts: {{ failed_hosts }}"
-          - "Custom variabelen uit vars.yml: {{ custom_vars }}"
+          - "Mislukte hosts: {{ ansible_play_hosts_all }}"
+          - "Gefilterde variabelen: {{ plugin_output }}"
       when: command_result.rc != 0
