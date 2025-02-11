@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import yaml
+import json
 from ansible.module_utils.basic import AnsibleModule
 
 def main():
@@ -11,9 +11,9 @@ def main():
     )
 
     try:
-        # Lees de inhoud van de vars.yml file
+        # Lees de inhoud van de vars.yml file als JSON (aangezien YAML vaak kan worden omgezet naar JSON)
         with open(module.params['vars_file'], 'r') as f:
-            vars_data = yaml.safe_load(f)
+            vars_data = json.load(f)  # Gebruik JSON in plaats van YAML
 
         # Hier sturen we de inhoud van de vars.yml terug
         module.exit_json(changed=False, vars_data=vars_data)
