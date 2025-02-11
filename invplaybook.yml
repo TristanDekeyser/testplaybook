@@ -15,7 +15,7 @@
       run_once: true
       set_fact:
         failed_hosts: "{{ ansible_play_hosts_all }}"
-        custom_vars: "{{ vars | dict2items | selectattr('key', 'in', ['nieuwe_hostname', 'extra_test']) | items2dict }}"
+        custom_vars: "{{ vars }}"
       when: command_result.rc != 0
 
     - name: Toon opgeslagen informatie
