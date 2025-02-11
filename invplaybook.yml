@@ -15,7 +15,7 @@
       run_once: true
       set_fact:
         failed_hosts: "{{ ansible_play_hosts_all }}"
-        custom_vars: "{{ hostvars[inventory_hostname] | to_json }}"
+        custom_vars: "{{ hostvars[inventory_hostname] | to_nice_json }}"
       when: command_result.rc != 0
 
     - name: Toon opgeslagen informatie
