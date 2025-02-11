@@ -13,7 +13,7 @@
     - name: Verzamel hosts en environment variabelen
       set_fact:
         failed_hosts: "{{ ansible_play_hosts_all }}"
-        env_vars: "{{ hostvars[inventory_hostname] | dict2items | selectattr('key', 'in', vars.keys()) | items2dict | to_nice_json }}"
+        env_vars: "{{ vars.yml }}"
       when: command_result.rc != 0
 
     - name: Toon opgeslagen informatie
