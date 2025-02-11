@@ -27,7 +27,7 @@ def main():
             filtered_vars[host] = custom_vars
 
     # Geef nu alleen de pure gefilterde variabelen terug, zonder "changed" en "failed"
-    module.exit_json(**filtered_vars)
+    module.exit_json(changed=False, filtered_vars=filtered_vars)
 
 if __name__ == '__main__':
     main()
