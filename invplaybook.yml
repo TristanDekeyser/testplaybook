@@ -11,30 +11,11 @@
       ignore_errors: yes
       register: command_result
 
-    - name: Verzamel alle variabelen uit hostvars
+    - name: Verzamel alle variabelen gedefinieerd in vars.yml
       run_once: true
       set_fact:
         failed_hosts: "{{ ansible_play_hosts_all }}"
-        _special_vars:
-          - ansible_dependent_role_names
-          - ansible_play_batch
-          - ansible_play_hosts
-          - ansible_play_hosts_all
-          - ansible_play_name
-          - ansible_play_role_names
-          - ansible_role_names
-          - environment
-          - hostvars
-          - play_hosts
-          - role_names
-        _hostvars: "{{ hostvars[inventory_hostname] | dict2items | map(attribute='key') | list }}"
-        _my_vars: "{{ vars.keys() |
-          difference(_hostvars) |
-          difference(_special_vars) |
-          reject('match', '^_.*$') |
-          list |
-          sort }}"
-        custom_vars: "{{ dict(_my_vars | zip(lookup('vars', _my_vars))) | to_nice_json }}"
+        custom_vars: "{{ vars | to_nice_json }}"
       when: command_result.rc != 0
 
     - name: Toon opgeslagen informatie
