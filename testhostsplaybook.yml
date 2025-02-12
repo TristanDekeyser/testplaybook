@@ -18,5 +18,6 @@
         msg: "{{ groups['gelukte_hosts'] }}"
 
     - name: Toon gefaalde hosts
+      run_once: true
       debug:
         msg: "{{ (ansible_play_hosts_all | difference(groups['gelukte_hosts'])) }}"
