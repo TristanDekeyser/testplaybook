@@ -1,10 +1,10 @@
-from ansible.module_utils.basic import AnsibleModule
 import requests
-import yaml  
+import yaml
+from ansible.module_utils.basic import AnsibleModule
 
 # Semaphore API Configuratie
 SEMAPHORE_URL = "http://192.168.242.133:3000/api"
-SEMAPHORE_TOKEN = "owozuup-zne7p-stkhhs3hdfr6efiyk1rh8okh_70bu="
+SEMAPHORE_TOKEN = "owozuup-zne7p-stkhhs3hdfr6efiyk1rh8okh_70bu="  # Voeg hier je token in
 PROJECT_ID = 1
 
 def get_last_playbook_name():
@@ -15,7 +15,7 @@ def get_last_playbook_name():
     }
 
     # Verkrijg de lijst van taken van de Semaphore API
-    response = requests.get(SEMAPHORE_URL, headers=headers)
+    response = requests.get(SEMAPHORE_URL + "/tasks", headers=headers)
 
     if response.status_code == 200:
         tasks = response.json()
@@ -75,7 +75,7 @@ def create_inventory(module, inventory_data):
         module.fail_json(msg=error_msg)  # Toont gedetailleerde foutinformatie
         return None
     
-def create_template(inventory_id, playbook_name):
+def create_template(module, inventory_id, playbook_name):
     url = f"{SEMAPHORE_URL}/project/{PROJECT_ID}/templates"
     headers = {"Authorization": f"Bearer {SEMAPHORE_TOKEN}", "Content-Type": "application/json"}
     payload = {
@@ -93,7 +93,14 @@ def create_template(inventory_id, playbook_name):
     }
 
     response = requests.post(url, headers=headers, json=payload)
-    return response.status_code in [200, 201]
+
+    if response.status_code in [200, 201]:
+        return True
+    else:
+        # Log de volledige responsinhoud om gedetailleerde foutinformatie te krijgen
+        error_msg = f"Fout bij het aanmaken van template: {response.status_code} - {response.text}"
+        module.fail_json(msg=error_msg)  # Gebruik fail_json om gedetailleerde foutinformatie terug te geven
+        return False
 
 def main():
     module = AnsibleModule(
@@ -108,13 +115,17 @@ def main():
         mislukte_hosts = module.params['mislukte_hosts']
         playbook_name = get_last_playbook_name()
 
+        if not playbook_name:
+            module.fail_json(msg="Geen playbook naam gevonden in de laatste taak!")
+
         # Maak een inventory met de mislukte hosts
         inventory_data = {"hosts": mislukte_hosts}
         inventory_id = create_inventory(module, inventory_data)
         if not inventory_id:
             module.fail_json(msg="Fout bij aanmaken van inventory!")
 
-        if not create_template(inventory_id, playbook_name):
+        # Maak het template met het playbook
+        if not create_template(module, inventory_id, playbook_name):
             module.fail_json(msg="Fout bij aanmaken van template!")
 
         module.exit_json(changed=True, msg="Semaphore resources succesvol aangemaakt!")
