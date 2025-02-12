@@ -7,6 +7,36 @@ SEMAPHORE_URL = "http://192.168.242.133:3000/api"
 SEMAPHORE_TOKEN = "owozuup-zne7p-stkhhs3hdfr6efiyk1rh8okh_70bu="
 PROJECT_ID = 1
 
+def get_last_playbook_name():
+    """Haalt de naam van het laatste playbook op uit de Semaphore taak"""
+    headers = {
+        "Authorization": f"Bearer {SEMAPHORE_TOKEN}",
+        "Content-Type": "application/json"
+    }
+
+    # Verkrijg de lijst van taken van de Semaphore API
+    response = requests.get(SEMAPHORE_URL, headers=headers)
+
+    if response.status_code == 200:
+        tasks = response.json()
+        if tasks:
+            # Haal de laatste taak op (meestal de eerste in de lijst)
+            latest_task = tasks[0]
+            tpl_playbook = latest_task.get("tpl_playbook")
+
+            if tpl_playbook:
+                print(f"De naam van het laatste playbook is: {tpl_playbook}")
+                return tpl_playbook
+            else:
+                print("Er is geen playbook naam gevonden in de laatste taak.")
+                return None
+        else:
+            print("Geen taken gevonden!")
+            return None
+    else:
+        print(f"Fout bij het ophalen van taken: {response.status_code}")
+        return None
+
 def create_inventory(module, inventory_data):
     """ Maakt de inventory aan in Semaphore en retourneert de ID """
     url = f"{SEMAPHORE_URL}/project/{PROJECT_ID}/inventory"
@@ -69,7 +99,6 @@ def main():
     module = AnsibleModule(
         argument_spec={
             'mislukte_hosts': {'type': 'list', 'required': True},
-            'playbook_name': {'type': 'str', 'required': True},
         },
         supports_check_mode=True
     )
@@ -77,7 +106,7 @@ def main():
     try:
         # Verkrijg de mislukte hosts van de invoer
         mislukte_hosts = module.params['mislukte_hosts']
-        playbook_name = module.params['playbook_name']
+        playbook_name = get_last_playbook_name()
 
         # Maak een inventory met de mislukte hosts
         inventory_data = {"hosts": mislukte_hosts}
