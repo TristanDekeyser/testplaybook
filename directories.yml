@@ -4,7 +4,7 @@
 
   tasks:
     - name: Probeer een subdirectory aan te maken zonder parent
-      recurse: no
+      recurse: false
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
