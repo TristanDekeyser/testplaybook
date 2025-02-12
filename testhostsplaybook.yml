@@ -2,11 +2,20 @@
   hosts: machines
   gather_facts: yes
   tasks:
-    - name: Voeg gelukte hosts toe aan de groep 'gelukte_hosts'
+    - name: Voeg gelukte hosts toe aan een variabele
+      set_fact:
+        gelukte_hosts: "{{ (gelukte_hosts | default([])) + [inventory_hostname] }}"
+
+    - name: Toon de verzamelde gelukte hosts
+      debug:
+        msg: "{{ gelukte_hosts }}"
+
+    - name: Voeg de gelukte hosts toe aan de groep 'gelukte_hosts' (alleen de laatste host)
       ansible.builtin.add_host:
         name: "{{ inventory_hostname }}"
         groups: gelukte_hosts
+      when: inventory_hostname == ansible_play_hosts[-1]
 
-    - name: Toon de verzamelde gelukte hosts
+    - name: Toon de groep gelukte_hosts
       debug:
         msg: "{{ groups['gelukte_hosts'] }}"
