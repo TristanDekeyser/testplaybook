@@ -1,32 +1,36 @@
-- name: Playbook voor inventory's te maken
+- name: Verwerken van machines
   hosts: machines
   gather_facts: yes
   tasks:
-    - name: Voeg gelukte hosts toe aan variabele
+    - name: Voeg tag toe aan succesvolle hosts
       set_fact:
-        gelukte_hosts: "{{ gelukte_hosts + [inventory_hostname] if gelukte_hosts is defined else [inventory_hostname] }}"
+        tagged_as_successful: true
 
-    - name: Toon gelukte hosts (debug)
+    - name: Voeg gelukte hosts toe aan de groep 'gelukte_hosts'
+      ansible.builtin.add_host:
+        name: "{{ item }}"
+        groups: gelukte_hosts
+      loop: "{{ ansible_play_hosts }}"
+      when: "'tagged_as_successful' in hostvars[item]"
+
+    - name: Toon de verzamelde gelukte hosts
+      run_once: true
       debug:
-        msg: "{{ gelukte_hosts }}"
+        msg: "{{ groups['gelukte_hosts'] }}"
 
-    - name: Voeg mislukte hosts toe aan variabele (alleen op de laatste succesvolle host)
+    - name: voeg mislukte hosts aan variabelen
+      run_once: true
       set_fact:
-        mislukte_hosts: "{{ (ansible_play_hosts_all | difference(gelukte_hosts)) }}"
-      when: inventory_hostname == gelukte_hosts[-1] # Check of dit de laatste succesvolle host is
-      run_once: yes
+        mislukte_hosts: "{{ (ansible_play_hosts_all | difference(groups['gelukte_hosts'])) }}"
+
+    - name: Toon gefaalde hosts
+      run_once: true
+      debug:
+        msg: "{{ mislukte_hosts }}"
 
     - name: Verzend mislukte hosts naar custom inventory module
       inventory:
         mislukte_hosts: "{{ mislukte_hosts }}"
       when: mislukte_hosts | length > 0
       register: output
-      run_once: yes
-
-    - name: Toon hosts
-      debug:
-        msg:
-          - "succesvolle hosts: {{ gelukte_hosts | default([]) }}"
-          - "mislukte hosts: {{ mislukte_hosts | default([]) }}"
-          - "alle hosts: {{ ansible_play_hosts_all }}"
       run_once: yes
