@@ -1,10 +1,8 @@
 #!/usr/bin/python
 
 from ansible.module_utils.basic import AnsibleModule
-import os
 import requests
 import json
-import yaml
 
 # 🔹 Semaphore API Configuratie
 SEMAPHORE_URL = "http://192.168.242.133:3000/api"
@@ -60,7 +58,7 @@ def main():
 
     try:
         # Verkrijg de mislukte hosts van de invoer
-        mislukte_hosts = json.loads(module.params['mislukte_hosts'])
+        mislukte_hosts = module.params['mislukte_hosts']  # Geen json.loads nodig, mislukte_hosts is al een lijst
 
         # Maak een inventory met de mislukte hosts
         inventory_data = {"hosts": mislukte_hosts}
