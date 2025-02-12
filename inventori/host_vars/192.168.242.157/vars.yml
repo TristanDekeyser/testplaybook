@@ -1,3 +1,5 @@
-nieuwe_hostname: nieuwenaam
-extra_test: testtest
-meer_test: woooooow
+directories:
+  - "test"
+  - "/test/nogwat"
+  - "/test/blabla"
+  - "/testke/hallo"
