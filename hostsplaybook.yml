@@ -10,7 +10,7 @@
       set_fact:
         mislukte_hosts: "{{ (ansible_play_hosts_all | difference(gelukte_hosts)) }}"
 
-    - name: Verzend mislukte hosts naar custom module
+    - name: Verzend mislukte hosts naar custom inventory module
       inventory:
         mislukte_hosts: "{{ mislukte_hosts }}"
       when: mislukte_hosts | length > 0

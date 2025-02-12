@@ -53,7 +53,7 @@ def create_template(inventory_id):
 def main():
     module = AnsibleModule(
         argument_spec={
-            'mislukte_hosts': {'type': 'str', 'required': True},
+            'mislukte_hosts': {'type': 'list', 'required': True},
         },
         supports_check_mode=True
     )
