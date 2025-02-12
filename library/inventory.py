@@ -7,7 +7,7 @@ SEMAPHORE_URL = "http://192.168.242.133:3000/api"
 SEMAPHORE_TOKEN = "owozuup-zne7p-stkhhs3hdfr6efiyk1rh8okh_70bu="  # Voeg hier je token in
 PROJECT_ID = 1
 
-def get_last_playbook_name():
+def get_last_playbook_name(module):
     """Haalt de naam van het laatste playbook op uit de Semaphore taak"""
     headers = {
         "Authorization": f"Bearer {SEMAPHORE_TOKEN}",
@@ -28,13 +28,16 @@ def get_last_playbook_name():
                 print(f"De naam van het laatste playbook is: {tpl_playbook}")
                 return tpl_playbook
             else:
-                print("Er is geen playbook naam gevonden in de laatste taak.")
+                error_msg = "Er is geen playbook naam gevonden in de laatste taak."
+                module.fail_json(msg=error_msg)
                 return None
         else:
-            print("Geen taken gevonden!")
+            error_msg = "Geen taken gevonden!"
+            module.fail_json(msg=error_msg)
             return None
     else:
-        print(f"Fout bij het ophalen van taken: {response.status_code}")
+        error_msg = f"Fout bij het ophalen van taken: {response.status_code}"
+        module.fail_json(msg=error_msg)
         return None
 
 def create_inventory(module, inventory_data):
@@ -113,7 +116,7 @@ def main():
     try:
         # Verkrijg de mislukte hosts van de invoer
         mislukte_hosts = module.params['mislukte_hosts']
-        playbook_name = get_last_playbook_name()
+        playbook_name = get_last_playbook_name(module)
 
         if not playbook_name:
             module.fail_json(msg="Geen playbook naam gevonden in de laatste taak!")
