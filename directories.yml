@@ -1,4 +1,4 @@
-- name: Test gefaalde variabelen opvangen
+- name: Test gefaalde variabelen opvangen zonder stoppen
   hosts: all
   become: yes
 
@@ -14,8 +14,8 @@
       command: "echo {{ item }}"
       loop: "{{ test_variabelen }}"
       register: resultaat
-      failed_when: "'fout' in item" # Als de variabele "fout" bevat, laten we de taak falen
-      ignore_error: yes
+      failed_when: "'fout' in item" # Laat de taak falen als de variabele "fout" bevat
+      ignore_errors: yes # Voorkomt dat Ansible stopt bij een fout
 
     - name: Verzamel mislukte variabelen
       set_fact:
