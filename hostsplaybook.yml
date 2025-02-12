@@ -10,11 +10,13 @@
       ignore_errors: yes
 
     - name: Voeg mislukte hosts toe aan variabele
-      run_once: yes
       set_fact:
-        failed_hosts: "{{ ansible_play_hosts | select('in', ansible_play_hosts_failed | default([])) | list }}"
+        failed_hosts: "{{ failed_hosts | default([]) + [inventory_hostname] }}"
+      when: >
+        (ping_result is failed) or
+        (ping_result.unreachable is defined and ping_result.unreachable)
 
     - name: Toon mislukte hosts
       debug:
-        msg: "Mislukte hosts: {{ failed_hosts }}"
+        msg: "Mislukte hosts: {{ failed_hosts | default([]) }}"
       run_once: yes
