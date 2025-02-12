@@ -2,10 +2,10 @@
   hosts: machines
   gather_facts: yes
   tasks:
-    - name: Voeg gelukte hosts toe aan de groep 'gelukte_hosts'
-      ansible.builtin.add_host:
-        name: "{{ inventory_hostname }}"
-        groups: gelukte_hosts
+    # - name: Voeg gelukte hosts toe aan de groep 'gelukte_hosts'
+    #   ansible.builtin.add_host:
+    #     name: "{{ inventory_hostname }}"
+    #     groups: gelukte_hosts
 
     - name: Toon de verzamelde gelukte hosts
       debug:
