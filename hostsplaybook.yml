@@ -1,0 +1,14 @@
+---
+- name: Playbook voor inventory's te maken
+  hosts: machines
+  gather_facts: no
+  tasks:
+    - name: Voeg mislukte hosts toe aan variabele
+      set_fact:
+        failed_hosts: "{{ failed_hosts | default([]) + [inventory_hostname] }}"
+      when: command_result.rc != 0
+
+    - name: Toon mislukte hosts
+      debug:
+        msg: "Mislukte hosts: {{ failed_hosts | default([]) }}"
+      run_once: yes
