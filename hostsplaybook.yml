@@ -6,11 +6,11 @@
       set_fact:
         gelukte_hosts: "{{ (gelukte_hosts | default([])) + [inventory_hostname] }}"
 
-    - name: Voeg mislukte hosts toe aan variabele (alleen op laatste host)
+    - name: Voeg mislukte hosts toe aan variabele (alleen op de laatste succesvolle host)
       set_fact:
         mislukte_hosts: "{{ (ansible_play_hosts_all | difference(gelukte_hosts)) }}"
-      when: inventory_hostname == ansible_play_hosts_all | last
-      run_once: no
+      when: inventory_hostname == gelukte_hosts[-1] # Check of dit de laatste succesvolle host is
+      run_once: yes
 
     - name: Verzend mislukte hosts naar custom inventory module
       inventory:
