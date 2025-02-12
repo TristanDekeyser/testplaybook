@@ -1,6 +1,6 @@
 from ansible.module_utils.basic import AnsibleModule
 import requests
-import json
+import yaml  # Zorg ervoor dat PyYAML is geïnstalleerd: pip install pyyaml
 
 # Semaphore API Configuratie
 SEMAPHORE_URL = "http://192.168.242.133:3000/api"
@@ -12,16 +12,27 @@ def create_inventory(module, inventory_data):
     url = f"{SEMAPHORE_URL}/project/{PROJECT_ID}/inventory"
     headers = {"Authorization": f"Bearer {SEMAPHORE_TOKEN}", "Content-Type": "application/json"}
     
-    # Format de inventory_data naar een INI-formaat string
-    inventory_string = "[machines]\n" + "\n".join(inventory_data["hosts"])
+    # Format de inventory_data naar een statisch YAML-formaat
+    inventory_yaml = {
+        "all": {
+            "children": {
+                "machines": {
+                    "hosts": inventory_data["hosts"]
+                }
+            }
+        }
+    }
+
+    # Converteer de dictionary naar YAML-formaat (inclusief juiste inspringingen)
+    inventory_string = yaml.dump(inventory_yaml, default_flow_style=False, allow_unicode=True)
 
     payload = {
         "name": "Backup Inventory",
         "project_id": PROJECT_ID,
-        "inventory": inventory_string,  # Gebruik de geformatteerde string hier
+        "inventory": inventory_string,  # Gebruik de YAML-string hier
         "ssh_key_id": 2,  # Controleer of je de juiste SSH key ID hebt
         "become_key_id": 4,  # Controleer of je de juiste become key ID hebt
-        "type": "static"
+        "type": "static-yaml"
     }
 
     response = requests.post(url, headers=headers, json=payload)
@@ -33,7 +44,6 @@ def create_inventory(module, inventory_data):
         error_msg = f"Fout bij aanmaken van inventory: {response.status_code} - {response.text}"
         module.fail_json(msg=error_msg)  # Toont gedetailleerde foutinformatie
         return None
-
 
 def main():
     module = AnsibleModule(
