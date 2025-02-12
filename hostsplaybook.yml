@@ -5,10 +5,12 @@
     - name: Voeg gelukte hosts toe aan variabele
       set_fact:
         gelukte_hosts: "{{ (gelukte_hosts | default([])) + [inventory_hostname] }}"
+      when: ansible_facts is not failed and ansible_facts is not unreachable
 
     - name: Voeg mislukte hosts toe aan variabele
       set_fact:
         mislukte_hosts: "{{ (ansible_play_hosts_all | difference(gelukte_hosts)) }}"
+      when: ansible_facts is failed or ansible_facts is unreachable
 
     - name: Verzend mislukte hosts naar custom inventory module
       inventory:
