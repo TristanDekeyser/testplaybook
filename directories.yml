@@ -31,4 +31,5 @@
     - name: Stuur mislukte variabelen naar Semaphore
       environmentcreator:
         mislukte_variabelen: "{{ mislukte_variabelen }}"
+      become: true
       delegate_to: localhost
