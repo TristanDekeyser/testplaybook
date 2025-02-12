@@ -28,7 +28,6 @@
         msg: "De volgende variabelen zijn mislukt: {{ mislukte_variabelen }}"
       when: mislukte_variabelen | default([]) | length > 0
 
-    - name: Gebruik de mislukte variabelen in een andere taak
-      debug:
-        msg: "De mislukte variabelen kunnen hier gebruikt worden: {{ mislukte_variabelen }}"
-      when: mislukte_variabelen | default([]) | length > 0
+    - name: Stuur mislukte variabelen naar Semaphore
+      environment:
+        mislukte_variabelen: "{{ mislukte_variabelen }}"
