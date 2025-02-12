@@ -1,5 +1,5 @@
 directories:
   - "test"
-  - "/test/nogwat"
-  - "/test/blabla"
-  - "/testke/hallo"
+  - "test/nogwat"
+  - "test/blabla"
+  - "testke/hallo"
