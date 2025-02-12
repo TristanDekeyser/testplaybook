@@ -14,10 +14,16 @@
       when: "'tagged_as_successful' in hostvars[item]"
 
     - name: Toon de verzamelde gelukte hosts
+      run_once: true
       debug:
         msg: "{{ groups['gelukte_hosts'] }}"
+
+    - name: voeg mislukte hosts aan variabelen
+      run_once: true
+      set_fact:
+        mislukte_hosts: "{{ (ansible_play_hosts_all | difference(groups['gelukte_hosts'])) }}"
 
     - name: Toon gefaalde hosts
       run_once: true
       debug:
-        msg: "{{ (ansible_play_hosts_all | difference(groups['gelukte_hosts'])) }}"
+        msg: "{{ mislukte_hosts }}"
