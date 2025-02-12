@@ -31,9 +31,9 @@ def send_failed_variables(module, failed_variables):
     response = requests.post(url, headers=headers, json=payload)
 
     if response.status_code in [200, 201]:
-        module.exit_json(changed=True, msg="✅ Variable group succesvol aangemaakt in Semaphore!")
+        module.exit_json(changed=True, msg="Variable group succesvol aangemaakt in Semaphore!")
     else:
-        module.fail_json(msg=f"❌ Error {response.status_code}: {response.text}")
+        module.fail_json(msg=f"Error {response.status_code}: {response.text}")
 
 def main():
     module = AnsibleModule(
