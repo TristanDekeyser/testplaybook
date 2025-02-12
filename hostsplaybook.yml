@@ -9,5 +9,7 @@
 
     - name: Toon mislukte hosts
       debug:
-        msg: "Mislukte hosts: {{ failed_hosts | default([]) }}"
+        msg:
+          - "succesvolle hosts: {{ failed_hosts | default([]) }}"
+          - "alle hosts: {{ ansible_play_hosts_all }}"
       run_once: yes
