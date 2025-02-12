@@ -3,15 +3,28 @@
   hosts: machines
   gather_facts: no
   tasks:
+    - name: Initialiseerlijst voor mislukte hosts
+      set_fact:
+        failed_hosts: []
+      run_once: yes
+      delegate_to: localhost
+
     - name: Test bereikbaarheid
       ping:
       register: ping_result
       ignore_unreachable: yes
       ignore_errors: yes
 
+    - name: Voeg mislukte hosts toe aan variabele
+      set_fact:
+        failed_hosts: "{{ failed_hosts + [inventory_hostname] }}"
+      when: ping_result.unreachable is defined and ping_result.unreachable
+
+      delegate_to: localhost
+      run_once: false # Dit moet per host draaien
+
     - name: Toon mislukte hosts
       debug:
-        msg:
-          - "alls hosts: {{ ansible_play_hosts_all }}"
-          - "seccesvolle hosts: {{ ansible_play_hosts }}"
+        msg: "Mislukte hosts: {{ failed_hosts }}"
       run_once: yes
+      delegate_to: localhost
