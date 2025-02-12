@@ -1,7 +1,7 @@
 ---
 - name: Playbook voor inventory's te maken
   hosts: machines
-  gather_facts: no
+  gather_facts: yes
   tasks:
     - name: Voeg mislukte hosts toe aan variabele
       set_fact:
