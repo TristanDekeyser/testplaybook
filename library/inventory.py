@@ -25,6 +25,9 @@ def create_inventory(inventory_data):
     response = requests.post(url, headers=headers, json=payload)
     if response.status_code in [200, 201]:
         return response.json().get("id")
+    else: 
+        error_msg = f"Fout bij aanmaken van inventory: {response.status_code} - {response.text}"
+        print(error_msg)  # Foutmelding loggen voor debug
     return None
 
 def create_template(inventory_id):
