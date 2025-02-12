@@ -1,11 +1,20 @@
 ---
-- name: Playbook voor inventory's te maken
+- name: Playbook voor mislukte hosts verzamelen
   hosts: machines
-  gather_facts: yes
+  gather_facts: no
   tasks:
+    - name: Test bereikbaarheid
+      ping:
+      register: ping_result
+      ignore_unreachable: yes
+      ignore_errors: yes
+
     - name: Voeg mislukte hosts toe aan variabele
       set_fact:
         failed_hosts: "{{ failed_hosts | default([]) + [inventory_hostname] }}"
+      when: >
+        (ping_result is failed) or
+        (ping_result.unreachable is defined and ping_result.unreachable)
 
     - name: Toon mislukte hosts
       debug:
