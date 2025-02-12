@@ -3,12 +3,21 @@
   become: yes
 
   tasks:
-    - name: Probeer een subdirectory aan te maken zonder parent
-      recurse: false
+    - name: Controleer of de parent directory bestaat
+      ansible.builtin.stat:
+        path: "{{ item | dirname }}"
+      loop: "{{ directories }}"
+      register: parent_dirs
+
+    - name: Forceer een fout als de parent directory niet bestaat
+      ansible.builtin.fail:
+        msg: "Parent directory ontbreekt voor {{ item }}"
+      loop: "{{ directories }}"
+      when: not parent_dirs.results[loop.index0].stat.exists
+
+    - name: Maak de directories aan (wordt alleen uitgevoerd als de parent bestaat)
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
         mode: "0755"
       loop: "{{ directories }}"
-      register: result
-      ignore_errors: no
