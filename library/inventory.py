@@ -17,18 +17,21 @@ def create_inventory(inventory_data):
         "name": "Backup Inventory",
         "project_id": PROJECT_ID,
         "inventory": inventory_data,
-        "ssh_key_id": 2,
-        "become_key_id": 4,
+        "ssh_key_id": 2,  # Controleer of je de juiste SSH key ID hebt
+        "become_key_id": 4,  # Controleer of je de juiste become key ID hebt
         "type": "static"
     }
 
     response = requests.post(url, headers=headers, json=payload)
+
     if response.status_code in [200, 201]:
         return response.json().get("id")
-    else: 
+    else:
+        # Geef gedetailleerde foutinformatie bij mislukking
         error_msg = f"Fout bij aanmaken van inventory: {response.status_code} - {response.text}"
-        print(error_msg)  # Foutmelding loggen voor debug
-    return None
+        # Dit zorgt ervoor dat de foutinformatie in de Ansible-uitvoer komt
+        module.fail_json(msg=error_msg)
+        return None
 
 def create_template(inventory_id):
     """ Maakt een template aan in Semaphore """
