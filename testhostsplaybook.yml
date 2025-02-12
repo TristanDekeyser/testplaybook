@@ -1,0 +1,12 @@
+- name: Verwerken van machines
+  hosts: machines
+  gather_facts: yes
+  tasks:
+    - name: Voeg gelukte hosts toe aan de groep 'mislukte_hosts'
+      ansible.builtin.add_host:
+        name: "{{ inventory_hostname }}"
+        groups: gelukte_hosts
+
+    - name: Toon de verzamelde gelukte hosts
+      debug:
+        msg: "{{ gelukte_hosts }}"
