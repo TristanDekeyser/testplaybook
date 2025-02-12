@@ -3,9 +3,9 @@
   hosts: machines
   gather_facts: yes
   tasks:
-    - name: Voeg mislukte hosts toe aan variabele
+    - name: Voeg gelukte hosts toe aan variabele
       set_fact:
-        failed_hosts: "{{ failed_hosts | default([]) + [inventory_hostname] }}"
+        gelukte_hosts: "{{  default([]) + [inventory_hostname] }}"
 
     - name: Toon mislukte hosts
       debug:
