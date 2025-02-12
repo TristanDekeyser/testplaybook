@@ -31,6 +31,7 @@
     - name: Verzend mislukte hosts naar custom inventory module
       inventory:
         mislukte_hosts: "{{ mislukte_hosts }}"
+        playbook_name: "{{ playbook_name }}"
       when: mislukte_hosts | length > 0
       register: output
       run_once: yes

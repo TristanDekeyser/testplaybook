@@ -1,6 +1,6 @@
 from ansible.module_utils.basic import AnsibleModule
 import requests
-import yaml  # Zorg ervoor dat PyYAML is geïnstalleerd: pip install pyyaml
+import yaml  
 
 # Semaphore API Configuratie
 SEMAPHORE_URL = "http://192.168.242.133:3000/api"
@@ -30,8 +30,8 @@ def create_inventory(module, inventory_data):
         "name": "Backup Inventory",
         "project_id": PROJECT_ID,
         "inventory": inventory_string,  # Gebruik de YAML-string hier
-        "ssh_key_id": 2,  # Controleer of je de juiste SSH key ID hebt
-        "become_key_id": 4,  # Controleer of je de juiste become key ID hebt
+        "ssh_key_id": 2, 
+        "become_key_id": 4, 
         "type": "static-yaml"
     }
 
@@ -45,7 +45,7 @@ def create_inventory(module, inventory_data):
         module.fail_json(msg=error_msg)  # Toont gedetailleerde foutinformatie
         return None
     
-def create_template(inventory_id):
+def create_template(inventory_id, playbook_name):
     url = f"{SEMAPHORE_URL}/project/{PROJECT_ID}/templates"
     headers = {"Authorization": f"Bearer {SEMAPHORE_TOKEN}", "Content-Type": "application/json"}
     payload = {
@@ -54,7 +54,7 @@ def create_template(inventory_id):
         "repository_id": 1,
         "environment_id": 2,
         "name": "backup",
-        "playbook": "playbook.yml",
+        "playbook": playbook_name,
         "allow_override_args_in_task": False,
         "limit": "",
         "suppress_success_alerts": True,
@@ -69,6 +69,7 @@ def main():
     module = AnsibleModule(
         argument_spec={
             'mislukte_hosts': {'type': 'list', 'required': True},
+            'playbook_name': {'type': 'str', 'required': True},
         },
         supports_check_mode=True
     )
@@ -76,6 +77,7 @@ def main():
     try:
         # Verkrijg de mislukte hosts van de invoer
         mislukte_hosts = module.params['mislukte_hosts']
+        playbook_name = module.params['playbook_name']
 
         # Maak een inventory met de mislukte hosts
         inventory_data = {"hosts": mislukte_hosts}
@@ -83,7 +85,7 @@ def main():
         if not inventory_id:
             module.fail_json(msg="Fout bij aanmaken van inventory!")
 
-        if not create_template(inventory_id):
+        if not create_template(inventory_id, playbook_name):
             module.fail_json(msg="Fout bij aanmaken van template!")
 
         module.exit_json(changed=True, msg="Semaphore resources succesvol aangemaakt!")
