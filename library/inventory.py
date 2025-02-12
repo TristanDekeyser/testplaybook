@@ -11,10 +11,14 @@ def create_inventory(module, inventory_data):
     """ Maakt de inventory aan in Semaphore en retourneert de ID """
     url = f"{SEMAPHORE_URL}/project/{PROJECT_ID}/inventory"
     headers = {"Authorization": f"Bearer {SEMAPHORE_TOKEN}", "Content-Type": "application/json"}
+    
+    # Format de inventory_data naar een INI-formaat string
+    inventory_string = "[machines]\n" + "\n".join(inventory_data["hosts"])
+
     payload = {
         "name": "Backup Inventory",
         "project_id": PROJECT_ID,
-        "inventory": inventory_data,
+        "inventory": inventory_string,  # Gebruik de geformatteerde string hier
         "ssh_key_id": 2,  # Controleer of je de juiste SSH key ID hebt
         "become_key_id": 4,  # Controleer of je de juiste become key ID hebt
         "type": "static"
@@ -29,6 +33,7 @@ def create_inventory(module, inventory_data):
         error_msg = f"Fout bij aanmaken van inventory: {response.status_code} - {response.text}"
         module.fail_json(msg=error_msg)  # Toont gedetailleerde foutinformatie
         return None
+
 
 def main():
     module = AnsibleModule(
