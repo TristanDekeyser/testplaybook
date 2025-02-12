@@ -6,9 +6,14 @@
       set_fact:
         gelukte_hosts: "{{ (gelukte_hosts | default([])) + [inventory_hostname] }}"
 
+    - name: Voeg mislukte hosts toe aan variabele
+      set_fact:
+        mislukte_hosts: "{{ (ansible_play_hosts_all | difference(gelukte_hosts)) }}"
+
     - name: Toon hosts
       debug:
         msg:
           - "succesvolle hosts: {{ gelukte_hosts | default([]) }}"
+          - "mislukte hosts: {{ mislukte_hosts | default([]) }}"
           - "alle hosts: {{ ansible_play_hosts_all }}"
       run_once: yes
