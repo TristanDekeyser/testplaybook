@@ -15,13 +15,12 @@
       ignore_unreachable: yes
       ignore_errors: yes
 
-    - name: Voeg mislukte hosts toe aan variabele
-      set_fact:
-        failed_hosts: "{{ failed_hosts + [inventory_hostname] }}"
-      when: ping_result.unreachable is defined and ping_result.unreachable
-
+    - name: Voeg mislukte hosts toe aan variabele via controller
       delegate_to: localhost
-      run_once: false # Dit moet per host draaien
+      run_once: yes
+      set_fact:
+        failed_hosts: "{{ failed_hosts + [item] }}"
+      with_items: "{{ ansible_play_hosts_all | difference(ansible_play_hosts) }}"
 
     - name: Toon mislukte hosts
       debug:
