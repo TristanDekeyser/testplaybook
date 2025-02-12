@@ -45,7 +45,7 @@ def create_inventory(module, inventory_data):
         module.fail_json(msg=error_msg)  # Toont gedetailleerde foutinformatie
         return None
     
-def create_template(inventory_id, environment_id):
+def create_template(inventory_id):
     url = f"{SEMAPHORE_URL}/project/{PROJECT_ID}/templates"
     headers = {"Authorization": f"Bearer {SEMAPHORE_TOKEN}", "Content-Type": "application/json"}
     payload = {
