@@ -15,7 +15,8 @@ def get_last_playbook_name(module):
     }
 
     # Verkrijg de lijst van taken van de Semaphore API
-    response = requests.get(SEMAPHORE_URL + "/tasks", headers=headers)
+    url = f"{SEMAPHORE_URL}/project/{PROJECT_ID}"
+    response = requests.get(url + "/tasks", headers=headers)
 
     if response.status_code == 200:
         tasks = response.json()
