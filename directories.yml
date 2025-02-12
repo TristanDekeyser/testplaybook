@@ -15,6 +15,7 @@
       loop: "{{ test_variabelen }}"
       register: resultaat
       failed_when: "'fout' in item" # Als de variabele "fout" bevat, laten we de taak falen
+      ignore_error: yes
 
     - name: Verzamel mislukte variabelen
       set_fact:
