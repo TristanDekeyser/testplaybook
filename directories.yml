@@ -1,23 +1,33 @@
-- name: Maak directories aan
+- name: Test gefaalde variabelen opvangen
   hosts: all
   become: yes
 
+  vars:
+    test_variabelen:
+      - "correcte_waarde"
+      - "fout_waarde"
+      - "nog_een_correcte_waarde"
+      - "nog_een_fout"
+
   tasks:
-    - name: Controleer of de parent directory bestaat
-      ansible.builtin.stat:
-        path: "{{ item | dirname }}"
-      loop: "{{ directories }}"
-      register: parent_dirs
+    - name: Simuleer een fout bij bepaalde variabelen
+      command: "echo {{ item }}"
+      loop: "{{ test_variabelen }}"
+      register: resultaat
+      failed_when: "'fout' in item" # Als de variabele "fout" bevat, laten we de taak falen
 
-    - name: Forceer een fout als de parent directory niet bestaat
-      ansible.builtin.fail:
-        msg: "Parent directory ontbreekt voor {{ item }}"
-      loop: "{{ directories }}"
-      when: not parent_dirs.results[loop.index0].stat.exists
+    - name: Verzamel mislukte variabelen
+      set_fact:
+        mislukte_variabelen: "{{ mislukte_variabelen | default([]) + [item.item] }}"
+      loop: "{{ resultaat.results }}"
+      when: item.failed | default(false)
 
-    - name: Maak de directories aan (wordt alleen uitgevoerd als de parent bestaat)
-      ansible.builtin.file:
-        path: "{{ item }}"
-        state: directory
-        mode: "0755"
-      loop: "{{ directories }}"
+    - name: Toon mislukte variabelen (voor debugging)
+      debug:
+        msg: "De volgende variabelen zijn mislukt: {{ mislukte_variabelen }}"
+      when: mislukte_variabelen | default([]) | length > 0
+
+    - name: Gebruik de mislukte variabelen in een andere taak
+      debug:
+        msg: "De mislukte variabelen kunnen hier gebruikt worden: {{ mislukte_variabelen }}"
+      when: mislukte_variabelen | default([]) | length > 0
