@@ -11,5 +11,7 @@
 
     - name: Toon mislukte hosts
       debug:
-        msg: "Mislukte hosts: {{ ansible_play_hosts_all }}"
+        msg:
+          - "alls hosts: {{ ansible_play_hosts_all }}"
+          - "seccesvolle hosts: {{ ansible_play_hosts }}"
       run_once: yes
