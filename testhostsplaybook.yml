@@ -16,3 +16,7 @@
     - name: Toon de verzamelde gelukte hosts
       debug:
         msg: "{{ groups['gelukte_hosts'] }}"
+
+    - name: Toon gefaalde hosts
+      debug:
+        msg: "{{ (ansible_play_hosts_all | difference(groups['gelukte_hosts'])) }}"
