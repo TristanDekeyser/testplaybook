@@ -4,14 +4,14 @@
   tasks:
     - name: Voeg tag toe aan succesvolle hosts
       set_fact:
-        gelukte_hosts: "{{ (gelukte_hosts | default([])) + [inventory_hostname] }}"
+        tagged_as_successful: true
 
     - name: Voeg gelukte hosts toe aan de groep 'gelukte_hosts'
       ansible.builtin.add_host:
         name: "{{ item }}"
         groups: gelukte_hosts
       loop: "{{ ansible_play_hosts }}"
-      when: "'gelukte' in hostvars[item].tags" # Voeg hier de juiste conditie toe die overeenkomt met de tag
+      when: "'tagged_as_successful' in hostvars[item]"
 
     - name: Toon de verzamelde gelukte hosts
       debug:
