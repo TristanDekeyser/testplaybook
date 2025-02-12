@@ -10,9 +10,11 @@
       ignore_errors: yes
 
     - name: Voeg mislukte hosts toe aan variabele
+      delegate_to: localhost
       run_once: yes
       set_fact:
-        failed_hosts: "{{ ansible_play_hosts | select('in', ansible_play_hosts_failed | default([])) | list }}"
+        failed_hosts: >-
+          {{ ansible_run_hosts | difference(ansible_play_hosts) | list }}
 
     - name: Toon mislukte hosts
       debug:
