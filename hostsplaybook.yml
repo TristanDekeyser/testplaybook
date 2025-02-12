@@ -5,11 +5,13 @@
   tasks:
     - name: Voeg gelukte hosts toe aan variabele
       set_fact:
-        gelukte_hosts: "{{  default([]) + [inventory_hostname] }}"
+        gelukte_hosts: "{{ (hostvars.localhost.gelukte_hosts | default([])) + [inventory_hostname] }}"
+      delegate_to: localhost
+      run_once: yes
 
     - name: Toon mislukte hosts
+      run_once: yes
       debug:
         msg:
-          - "succesvolle hosts: {{ gelukte_hosts | default([]) }}"
-          - "alle hosts: {{ ansible_play_hosts_all }}"
-      run_once: yes
+          - "Succesvolle hosts: {{ hostvars.localhost.gelukte_hosts | default([]) }}"
+          - "Mislukte hosts: {{ ansible_play_hosts_all | difference(hostvars.localhost.gelukte_hosts | default([])) }}"
