@@ -1,17 +1,14 @@
----
 - name: Playbook voor inventory's te maken
   hosts: machines
   gather_facts: yes
   tasks:
     - name: Voeg gelukte hosts toe aan variabele
       set_fact:
-        gelukte_hosts: "{{ (hostvars.localhost.gelukte_hosts | default([])) + [inventory_hostname] }}"
-      delegate_to: localhost
-      run_once: yes
+        gelukte_hosts: "{{ (gelukte_hosts | default([])) + [inventory_hostname] }}"
 
-    - name: Toon mislukte hosts
-      run_once: yes
+    - name: Toon hosts
       debug:
         msg:
-          - "Succesvolle hosts: {{ hostvars.localhost.gelukte_hosts | default([]) }}"
-          - "Mislukte hosts: {{ ansible_play_hosts_all | difference(hostvars.localhost.gelukte_hosts | default([])) }}"
+          - "succesvolle hosts: {{ gelukte_hosts | default([]) }}"
+          - "alle hosts: {{ ansible_play_hosts_all }}"
+      run_once: yes
