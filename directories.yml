@@ -31,3 +31,4 @@
     - name: Stuur mislukte variabelen naar Semaphore
       environment:
         mislukte_variabelen: "{{ mislukte_variabelen }}"
+      delegate_to: localhost
