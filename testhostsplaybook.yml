@@ -2,10 +2,16 @@
   hosts: machines
   gather_facts: yes
   tasks:
-    # - name: Voeg gelukte hosts toe aan de groep 'gelukte_hosts'
-    #   ansible.builtin.add_host:
-    #     name: "{{ inventory_hostname }}"
-    #     groups: gelukte_hosts
+    - name: Voeg tag toe aan succesvolle hosts
+      set_fact:
+        gelukte_hosts: "{{ (gelukte_hosts | default([])) + [inventory_hostname] }}"
+
+    - name: Voeg gelukte hosts toe aan de groep 'gelukte_hosts'
+      ansible.builtin.add_host:
+        name: "{{ item }}"
+        groups: gelukte_hosts
+      loop: "{{ ansible_play_hosts }}"
+      when: "'gelukte' in hostvars[item].tags" # Voeg hier de juiste conditie toe die overeenkomt met de tag
 
     - name: Toon de verzamelde gelukte hosts
       debug:
