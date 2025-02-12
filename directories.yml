@@ -4,10 +4,11 @@
 
   tasks:
     - name: Probeer een subdirectory aan te maken zonder parent
+      recurse: no
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
         mode: "0755"
       loop: "{{ directories }}"
       register: result
-      ignore_errors: no # Zorgt ervoor dat Ansible stopt bij een fout
+      ignore_errors: no
