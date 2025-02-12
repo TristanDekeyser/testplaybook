@@ -25,9 +25,9 @@ def create_inventory(module, inventory_data):
     if response.status_code in [200, 201]:
         return response.json().get("id")
     else:
-        # Geef gedetailleerde foutinformatie bij mislukking
+        # Log de volledige responsinhoud om gedetailleerde foutinformatie te krijgen
         error_msg = f"Fout bij aanmaken van inventory: {response.status_code} - {response.text}"
-        module.fail_json(msg=error_msg)
+        module.fail_json(msg=error_msg)  # Toont gedetailleerde foutinformatie
         return None
 
 def main():
