@@ -44,6 +44,26 @@ def create_inventory(module, inventory_data):
         error_msg = f"Fout bij aanmaken van inventory: {response.status_code} - {response.text}"
         module.fail_json(msg=error_msg)  # Toont gedetailleerde foutinformatie
         return None
+    
+def create_template(inventory_id, environment_id):
+    url = f"{SEMAPHORE_URL}/project/{PROJECT_ID}/templates"
+    headers = {"Authorization": f"Bearer {SEMAPHORE_TOKEN}", "Content-Type": "application/json"}
+    payload = {
+        "project_id": PROJECT_ID,
+        "inventory_id": inventory_id,
+        "repository_id": 1,
+        "environment_id": 2,
+        "name": "backup",
+        "playbook": "playbook.yml",
+        "allow_override_args_in_task": False,
+        "limit": "",
+        "suppress_success_alerts": True,
+        "app": "ansible",
+        "git_branch": "main"
+    }
+
+    response = requests.post(url, headers=headers, json=payload)
+    return response.status_code in [200, 201]
 
 def main():
     module = AnsibleModule(
@@ -62,6 +82,9 @@ def main():
         inventory_id = create_inventory(module, inventory_data)
         if not inventory_id:
             module.fail_json(msg="Fout bij aanmaken van inventory!")
+
+        if not create_template(inventory_id):
+            module.fail_json(msg="Fout bij aanmaken van template!")
 
         module.exit_json(changed=True, msg="Semaphore resources succesvol aangemaakt!")
 
