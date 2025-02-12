@@ -4,11 +4,13 @@
   tasks:
     - name: Voeg gelukte hosts toe aan variabele
       set_fact:
-        gelukte_hosts: "{{ (gelukte_hosts | default([])) + [inventory_hostname] }}"
+        gelukte_hosts: "{{ gelukte_hosts + [inventory_hostname] if gelukte_hosts is defined else [inventory_hostname] }}"
 
     - name: Toon gelukte hosts (debug)
       debug:
         msg: "{{ gelukte_hosts }}"
+      when: inventory_hostname == gelukte_hosts[-1] # Check of dit de laatste succesvolle host is
+      run_once: yes
 
     - name: Voeg mislukte hosts toe aan variabele (alleen op de laatste succesvolle host)
       set_fact:
