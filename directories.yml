@@ -29,6 +29,6 @@
       when: mislukte_variabelen | default([]) | length > 0
 
     - name: Stuur mislukte variabelen naar Semaphore
-      environment:
+      environmentcreator:
         mislukte_variabelen: "{{ mislukte_variabelen }}"
       delegate_to: localhost
