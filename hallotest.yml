@@ -1,0 +1,13 @@
+---
+- name: Test Playbook om custom module aan te roepen
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Voer het commando uit met de hallo module
+      subdir.hallo:
+        command: "echo 'Hallo, Ansible!'"
+      register: resultaat
+
+    - name: Toon het resultaat van het commando
+      debug:
+        msg: "De uitvoer is: {{ resultaat.stdout }}"
