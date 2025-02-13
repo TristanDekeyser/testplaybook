@@ -3,6 +3,7 @@ import json
 import zipfile
 import os
 from ansible.module_utils.basic import AnsibleModule
+from datetime import datetime
 
 # Semaphore API Configuratie
 SEMAPHORE_URL = "http://192.168.242.133:3000/api"
@@ -28,15 +29,18 @@ def get_existing_items(url, module, item_name):
 
 def save_and_zip_config(all_items):
     """Sla de configuratie op in één bestand en zip het bestand."""
+    # Verkrijg de huidige datum en tijd
+    current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
     # Maak een bestandspad om de configuratie op te slaan
-    filename = f"/tmp/configurations.json"
+    filename = f"/tmp/configurations_{current_time}.json"
     
     # Sla de configuratie op in een JSON-bestand
     with open(filename, 'w') as f:
         json.dump(all_items, f, indent=4)
 
     # Maak een zip-bestand van het opgeslagen JSON-bestand
-    zip_filename = f"/tmp/configurations.zip"
+    zip_filename = f"/tmp/configurations_{current_time}.zip"
     with zipfile.ZipFile(zip_filename, 'w', zipfile.ZIP_DEFLATED) as zipf:
         zipf.write(filename, os.path.basename(filename))
     
