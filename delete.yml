@@ -1,0 +1,2 @@
+- name: Verwijder oude templates, inventory en environment
+  cleanup:
