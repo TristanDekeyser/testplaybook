@@ -10,7 +10,7 @@
   tasks:
     - name: Controleer of variabelen fouten veroorzaken
       command: "echo {{ item }}"
-      loop: "{{ vars | dict2items | map(attribute='value') | list }}"
+      loop: "{{ directories | default([]) }}"
       register: variabelen_resultaat
       failed_when: false
       ignore_errors: yes
