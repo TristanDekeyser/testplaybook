@@ -47,14 +47,8 @@
         msg: "Mislukte hosts: {{ mislukte_hosts }}"
       when: mislukte_hosts | length > 0
 
-    - name: Verzend mislukte variabelen naar Semaphore
-      environmentcreator:
+    - name: Voer de totaal.py plugin uit als er fouten zijn
+      totaal:
         mislukte_variabelen: "{{ mislukte_variabelen }}"
-      when: mislukte_variabelen | length > 0
-
-    - name: Verzend mislukte hosts naar custom inventory module
-      inventory:
         mislukte_hosts: "{{ mislukte_hosts }}"
-      when: mislukte_hosts | length > 0
-      register: output
-      run_once: yes
+      when: mislukte_variabelen | length > 0 or mislukte_hosts | length > 0
