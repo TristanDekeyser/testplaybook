@@ -10,24 +10,29 @@
       - "nog_een_fout"
 
   tasks:
+    - name: Initialiseert de lijst met mislukte variabelen
+      set_fact:
+        mislukte_variabelen: []
+
     - name: Simuleer een fout bij bepaalde variabelen
       command: "echo {{ item }}"
       loop: "{{ test_variabelen }}"
       register: resultaat
-      failed_when: "'fout' in item" # Laat de taak falen als de variabele "fout" bevat
-      ignore_errors: yes # Voorkomt dat Ansible stopt bij een fout
+      failed_when: "'fout' in item" # Pas dit aan voor andere foutdetectie
+      ignore_errors: yes
 
     - name: Verzamel mislukte variabelen
       set_fact:
-        mislukte_variabelen: "{{ mislukte_variabelen | default([]) + [item.item] }}"
+        mislukte_variabelen: "{{ mislukte_variabelen + [item.item] }}"
       loop: "{{ resultaat.results }}"
       when: item.failed | default(false)
 
     - name: Toon mislukte variabelen (voor debugging)
       debug:
         msg: "De volgende variabelen zijn mislukt: {{ mislukte_variabelen }}"
-      when: mislukte_variabelen | default([]) | length > 0
+      when: mislukte_variabelen | length > 0
 
     - name: Stuur mislukte variabelen naar Semaphore
       environmentcreator:
         mislukte_variabelen: "{{ mislukte_variabelen }}"
+      when: mislukte_variabelen | length > 0
