@@ -1,2 +1,5 @@
 - name: Verwijder oude templates, inventory en environment
-  cleanup:
+  hosts: localhost
+  tasks:
+    - name: Voer cleanup module uit
+      cleanup:
