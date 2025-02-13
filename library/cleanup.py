@@ -13,42 +13,48 @@ HEADERS = {
 }
 
 def get_existing_items(url, module, item_name):
-    """Haal alle items op en zoek naar een specifieke naam."""
+    """Haal alle items op en zoek naar items met een specifieke naam."""
     response = requests.get(url, headers=HEADERS)
     if response.status_code == 200:
         items = response.json()
-        for item in items:
-            if item.get("name") == item_name:
-                return item.get("id")
+        matched_items = [item for item in items if item.get("name") == item_name]
+        return matched_items
     else:
         module.fail_json(msg=f"Fout bij ophalen van {item_name}: {response.status_code} - {response.text}")
-    return None
+    return []
 
-def delete_item(url, module, item_name):
-    """Verwijdert een item als het bestaat."""
-    item_id = get_existing_items(url, module, item_name)
-    if item_id:
-        delete_url = f"{url}/{item_id}"
-        response = requests.delete(delete_url, headers=HEADERS)
-        if response.status_code in [200, 204]:
-            return f"{item_name} succesvol verwijderd."
-        else:
-            module.fail_json(msg=f"Fout bij verwijderen van {item_name}: {response.status_code} - {response.text}")
-    return f"{item_name} niet gevonden, geen actie nodig."
+def delete_oldest_items(url, module, items, number_to_delete=10):
+    """Verwijder de oudste items (met de laagste ID's)."""
+    if len(items) > number_to_delete:
+        # Sorteer op ID om de oudste te krijgen
+        sorted_items = sorted(items, key=lambda x: x.get("id"))
+        items_to_delete = sorted_items[:number_to_delete]
+        
+        for item in items_to_delete:
+            delete_url = f"{url}/{item['id']}"
+            response = requests.delete(delete_url, headers=HEADERS)
+            if response.status_code in [200, 204]:
+                print(f"Item {item['name']} met ID {item['id']} succesvol verwijderd.")
+            else:
+                module.fail_json(msg=f"Fout bij verwijderen van item {item['name']} met ID {item['id']}: {response.status_code} - {response.text}")
+    else:
+        print(f"Er zijn minder dan {number_to_delete} items met de naam gevonden. Geen items verwijderd.")
 
 def main():
     module = AnsibleModule(argument_spec={}, supports_check_mode=True)
 
     try:
-        template_result = delete_item(f"{SEMAPHORE_URL}/project/{PROJECT_ID}/templates", module, "Backup Template")
-        inventory_result = delete_item(f"{SEMAPHORE_URL}/project/{PROJECT_ID}/inventory", module, "Backup Inventory")
-        environment_result = delete_item(f"{SEMAPHORE_URL}/project/{PROJECT_ID}/environment", module, "Mislukte Variabelen")
+        # Haal de items op voor templates, inventory en environment
+        template_items = get_existing_items(f"{SEMAPHORE_URL}/project/{PROJECT_ID}/templates", module, "Backup Template")
+        inventory_items = get_existing_items(f"{SEMAPHORE_URL}/project/{PROJECT_ID}/inventory", module, "Backup Inventory")
+        environment_items = get_existing_items(f"{SEMAPHORE_URL}/project/{PROJECT_ID}/environment", module, "Mislukte Variabelen")
 
-        module.exit_json(changed=True, msg="Cleanup voltooid.", details={
-            "template": template_result,
-            "inventory": inventory_result,
-            "environment": environment_result
-        })
+        # Verwijder de oudste items als er meer dan 10 zijn
+        delete_oldest_items(f"{SEMAPHORE_URL}/project/{PROJECT_ID}/templates", module, template_items)
+        delete_oldest_items(f"{SEMAPHORE_URL}/project/{PROJECT_ID}/inventory", module, inventory_items)
+        delete_oldest_items(f"{SEMAPHORE_URL}/project/{PROJECT_ID}/environment", module, environment_items)
+
+        module.exit_json(changed=True, msg="Cleanup voltooid.")
 
     except Exception as e:
         module.fail_json(msg=f"Fout: {str(e)}")
