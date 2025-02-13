@@ -1,5 +1,6 @@
 - name: Verwijder oude templates, inventory en environment
   hosts: localhost
+  gather_facts: no
   tasks:
     - name: Voer cleanup module uit
       cleanup:
