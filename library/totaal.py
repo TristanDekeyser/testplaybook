@@ -91,7 +91,7 @@ def main():
     if not playbook_name:
         module.fail_json(msg="Geen playbook naam gevonden!")
 
-    inventory_id = 1 if not failed_hosts else create_inventory(module, failed_hosts)
+    inventory_id = 16 if not failed_hosts else create_inventory(module, failed_hosts)
     environment_id = 2 if not failed_vars else create_environment(module, failed_vars)
 
     if create_template(module, inventory_id, environment_id, playbook_name):
