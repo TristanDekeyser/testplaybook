@@ -23,7 +23,7 @@ def get_existing_items(url, module, item_name):
         module.fail_json(msg=f"Fout bij ophalen van {item_name}: {response.status_code} - {response.text}")
     return []
 
-def delete_oldest_items(url, module, items, number_to_delete=10):
+def delete_oldest_items(url, module, items, number_to_delete=2):
     """Verwijder de oudste items (met de laagste ID's)."""
     if len(items) > number_to_delete:
         # Sorteer op ID om de oudste te krijgen
