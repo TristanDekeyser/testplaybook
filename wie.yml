@@ -11,18 +11,18 @@
         msg: "Het playbook wordt uitgevoerd door gebruiker: {{ current_user.stdout }}"
 
     - name: Controleer of SSH-agent actief is
-      shell: echo "$SSH_AUTH_SOCK"
-      register: ssh_auth_sock
+      command: echo $SSH_AUTH_SOCK
+      register: ssh_agent_sock
       changed_when: false
 
     - name: Debug SSH-agent socket
       debug:
-        msg: "SSH_AUTH_SOCK: {{ ssh_auth_sock.stdout }}"
+        msg: "SSH_AUTH_SOCK: {{ ssh_agent_sock.stdout }}"
 
     - name: Controleer welke SSH-sleutel wordt gebruikt
-      shell: ssh-add -l
+      command: ssh-add -l
       environment:
-        SSH_AUTH_SOCK: "{{ ssh_auth_sock.stdout }}"
+        SSH_AUTH_SOCK: "{{ ssh_agent_sock.stdout }}"
       register: ssh_key
       ignore_errors: yes
 
