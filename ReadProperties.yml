@@ -11,7 +11,7 @@
     - name: Clone the GitHub repository
       git:
         repo: "git@git.is4u.be:stage/stage-2025-ansible-tower/client-configurations.git"
-        dest: /tmp
+        dest: /tmp/client_configuration
         version: main
 
     # - name: Read variables from vars.yml
