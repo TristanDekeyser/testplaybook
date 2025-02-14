@@ -15,6 +15,14 @@
         version: main
       when: not repo_exists.stat.exists
 
+    - name: Pull the latest changes if the repository exists
+      git:
+        repo: "git@git.is4u.be:stage/stage-2025-ansible-tower/client-configurations.git"
+        dest: /tmp/client-configuration
+        version: main
+        update: yes
+      when: repo_exists.stat.exists
+
     - name: Read variables from vars.yml
       include_vars:
         file: /tmp/client_configuration/DEV/testClient.yml
