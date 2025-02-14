@@ -1,6 +1,7 @@
 ---
 - name: Pull or update GitHub repo and read variables
   hosts: localhost
+  become: yes
 
   tasks:
     - name: Check if the repository exists
