@@ -5,7 +5,7 @@
   tasks:
     - name: Check if the repository exists
       stat:
-        path: .
+        path: /tmp/client_configuration
       register: repo_exists
 
     - name: Clone the GitHub repository
@@ -13,19 +13,20 @@
         repo: "git@git.is4u.be:stage/stage-2025-ansible-tower/client-configurations.git"
         dest: /tmp/client_configuration
         version: main
+      when: not.repo_exists
 
-    # - name: Read variables from vars.yml
-    #   include_vars:
-    #     file: repository_1_4/DEV/testClient.yml
+    - name: Read variables from vars.yml
+      include_vars:
+        file: /tmp/client_configuration/DEV/testClient.yml
 
-    # - name: Display variables
-    #   debug:
-    #     msg:
-    #       - "Client Name: {{ client_name }}"
-    #       - "Definition Name: {{ definition_name }}"
-    #       - "Company Name: {{ company_name }}"
-    #       - "Redirect URIs: {{ redirect_uri }}"
-    #       - "Client ID: {{ client_id }}"
-    #       - "Client Secret: {{ client_secret }}"
-    #       - "Require PKCE: {{ require_pkce }}"
-    #       - "Ext Properties: {{ extProperties }}"
+    - name: Display variables
+      debug:
+        msg:
+          - "Client Name: {{ client_name }}"
+          - "Definition Name: {{ definition_name }}"
+          - "Company Name: {{ company_name }}"
+          - "Redirect URIs: {{ redirect_uri }}"
+          - "Client ID: {{ client_id }}"
+          - "Client Secret: {{ client_secret }}"
+          - "Require PKCE: {{ require_pkce }}"
+          - "Ext Properties: {{ extProperties }}"
