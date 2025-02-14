@@ -10,22 +10,12 @@
       debug:
         msg: "Het playbook wordt uitgevoerd door gebruiker: {{ current_user.stdout }}"
 
-    - name: Forceer de SSH_AUTH_SOCK-variabele in Semaphore
-      command: echo $SSH_AUTH_SOCK
-      register: ssh_agent_sock
-      changed_when: false
+    - name: Haal de SSH-sleutels op
+      authorized_key:
+        user: "{{ ansible_user }}"
+        state: present
+      register: ssh_keys
 
-    - name: Debug SSH_AUTH_SOCK binnen Semaphore
+    - name: Toon de SSH-sleutels
       debug:
-        msg: "Semaphore SSH_AUTH_SOCK: {{ ssh_agent_sock.stdout }}"
-
-    - name: Controleer welke SSH-sleutel wordt gebruikt
-      command: ssh-add -l
-      environment:
-        SSH_AUTH_SOCK: "{{ ssh_agent_sock.stdout }}"
-      register: ssh_key
-      ignore_errors: yes
-
-    - name: Toon de gebruikte SSH-sleutel
-      debug:
-        msg: "De gebruikte SSH-sleutel(s): {{ ssh_key.stdout_lines }}"
+        var: ssh_keys
