@@ -1,8 +1,35 @@
 ---
-- name: Read variables from GitHub repo
+- name: Pull or update GitHub repo and read variables
   hosts: localhost
+  vars_files:
+    - vars.yml
 
   tasks:
+    - name: Ensure git is installed
+      apt:
+        name: git
+        state: present
+
+    - name: Check if the repository exists
+      stat:
+        path: client-configurations
+      register: repo_exists
+
+    - name: Clone the GitHub repository if it doesn't exist
+      git:
+        repo: "git@git.is4u.be:stage/stage-2025-ansible-tower/client-configurations.git"
+        dest: .
+        version: main
+      when: not repo_exists.stat.exists
+
+    - name: Pull the latest changes if the repository exists
+      git:
+        repo: "git@git.is4u.be:stage/stage-2025-ansible-tower/client-configurations.git"
+        dest: .
+        version: main
+        update: yes
+      when: repo_exists.stat.exists
+
     - name: Read variables from vars.yml
       include_vars:
         file: client-configurations/DEV/testClient.yml
