@@ -11,7 +11,7 @@
       command: ssh-add -L
       register: ssh_keys_output
       become: yes
-      become_user: "{{ ansible_user }}"
+      become_user: "s140498"
 
     - name: Toon de geladen SSH-sleutels
       debug:
