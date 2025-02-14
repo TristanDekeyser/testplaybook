@@ -10,14 +10,14 @@
       debug:
         msg: "Het playbook wordt uitgevoerd door gebruiker: {{ current_user.stdout }}"
 
-    - name: Controleer of SSH-agent actief is
+    - name: Forceer de SSH_AUTH_SOCK-variabele in Semaphore
       command: echo $SSH_AUTH_SOCK
       register: ssh_agent_sock
       changed_when: false
 
-    - name: Debug SSH-agent socket
+    - name: Debug SSH_AUTH_SOCK binnen Semaphore
       debug:
-        msg: "SSH_AUTH_SOCK: {{ ssh_agent_sock.stdout }}"
+        msg: "Semaphore SSH_AUTH_SOCK: {{ ssh_agent_sock.stdout }}"
 
     - name: Controleer welke SSH-sleutel wordt gebruikt
       command: ssh-add -l
