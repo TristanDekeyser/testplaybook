@@ -3,11 +3,6 @@
   hosts: localhost
 
   tasks:
-    - name: Ensure git is installed
-      apt:
-        name: git
-        state: present
-
     - name: Check if the repository exists
       stat:
         path: .
