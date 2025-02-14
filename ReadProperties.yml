@@ -13,7 +13,6 @@
         repo: "git@git.is4u.be:stage/stage-2025-ansible-tower/client-configurations.git"
         dest: repository_1_4
         version: main
-      when: not repo_exists.stat.exists
 
     - name: Read variables from vars.yml
       include_vars:
