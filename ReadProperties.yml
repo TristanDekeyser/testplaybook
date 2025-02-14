@@ -8,15 +8,15 @@
         path: .
       register: repo_exists
 
-    - name: Clone the GitHub repository
-      git:
-        repo: "git@git.is4u.be:stage/stage-2025-ansible-tower/client-configurations.git"
-        dest: repository_1_4
-        version: main
+    # - name: Clone the GitHub repository
+    #   git:
+    #     repo: "git@git.is4u.be:stage/stage-2025-ansible-tower/client-configurations.git"
+    #     dest: repository_1_4
+    #     version: main
 
     - name: Read variables from vars.yml
       include_vars:
-        file: /DEV/testClient.yml
+        file: repository_1_4/DEV/testClient.yml
 
     - name: Display variables
       debug:
