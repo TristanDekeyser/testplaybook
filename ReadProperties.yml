@@ -15,7 +15,7 @@
 
     - name: Toon de geladen SSH-sleutels
       debug:
-      var: ssh_keys_output.stdou
+        msg: "{{ ssh_keys_output.stdou }}"
 
     - name: Check if the repository exists
       stat:
