@@ -11,14 +11,14 @@
     - name: Clone the GitHub repository if it doesn't exist
       git:
         repo: "git@git.is4u.be:stage/stage-2025-ansible-tower/client-configurations.git"
-        dest: .
+        dest: /home/s1404998
         version: main
       when: not repo_exists.stat.exists
 
     - name: Pull the latest changes if the repository exists
       git:
         repo: "git@git.is4u.be:stage/stage-2025-ansible-tower/client-configurations.git"
-        dest: .
+        dest: /home/s140498
         version: main
         update: yes
       when: repo_exists.stat.exists
