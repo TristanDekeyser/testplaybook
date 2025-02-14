@@ -11,8 +11,10 @@
         msg: "Het playbook wordt uitgevoerd door gebruiker: {{ current_user.stdout }}"
 
     - name: Controleer welke SSH-sleutel wordt gebruikt
-      command: echo $SSH_AUTH_SOCK
+      command: /bin/bash -c 'echo $SSH_AUTH_SOCK'
       register: ssh_key
+      environment:
+        SSH_AUTH_SOCK: "{{ lookup('env', 'SSH_AUTH_SOCK') }}"
 
     - name: Toon de gebruikte SSH-sleutel
       debug:
