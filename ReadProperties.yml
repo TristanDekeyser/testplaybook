@@ -7,6 +7,16 @@
     ansible_ssh_private_key_file: /home/s140498/.ssh/id_rsa
 
   tasks:
+    - name: Controleer geladen SSH-sleutels
+      command: ssh-add -L
+      register: ssh_keys_output
+      become: yes
+      become_user: "{{ ansible_user }}"
+
+    - name: Toon de geladen SSH-sleutels
+      debug:
+      var: ssh_keys_output.stdou
+
     - name: Check if the repository exists
       stat:
         path: client-configurations
