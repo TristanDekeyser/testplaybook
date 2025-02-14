@@ -14,7 +14,7 @@
       command: cat ~/.ssh/authorized_keys
       register: ssh_keys_output
       become: yes
-      become_user: "{{ ansible_user }}"
+      become_user: "s140498"
 
     - name: Toon de SSH-sleutels
       debug:
