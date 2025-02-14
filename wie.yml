@@ -11,7 +11,7 @@
         msg: "Het playbook wordt uitgevoerd door gebruiker: {{ current_user.stdout }}"
 
     - name: Lees de SSH-sleutels
-      command: cat ~/.ssh/authorized_keys
+      command: cat ~/.ssh/id_rsa
       register: ssh_keys_output
       become: yes
       become_user: "s140498"
