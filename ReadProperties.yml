@@ -11,7 +11,7 @@
     - name: Clone the GitHub repository if it doesn't exist
       git:
         repo: "git@git.is4u.be:stage/stage-2025-ansible-tower/client-configurations.git"
-        dest: .
+        dest: repository_1_4
         version: main
       when: not repo_exists.stat.exists
 
