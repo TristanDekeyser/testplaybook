@@ -9,3 +9,11 @@
     - name: Toon de uitvoerende gebruiker
       debug:
         msg: "Het playbook wordt uitgevoerd door gebruiker: {{ current_user.stdout }}"
+
+    - name: Controleer welke SSH-sleutel wordt gebruikt
+      command: echo $SSH_AUTH_SOCK
+      register: ssh_key
+
+    - name: Toon de gebruikte SSH-sleutel
+      debug:
+        msg: "De gebruikte SSH-sleutel socket is: {{ ssh_key.stdout }}"
