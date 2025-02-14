@@ -8,20 +8,12 @@
         path: .
       register: repo_exists
 
-    - name: Clone the GitHub repository if it doesn't exist
+    - name: Clone the GitHub repository
       git:
         repo: "git@git.is4u.be:stage/stage-2025-ansible-tower/client-configurations.git"
         dest: repository_1_4
         version: main
       when: not repo_exists.stat.exists
-
-    - name: Pull the latest changes if the repository exists
-      git:
-        repo: "git@git.is4u.be:stage/stage-2025-ansible-tower/client-configurations.git"
-        dest: .
-        version: main
-        update: yes
-      when: repo_exists.stat.exists
 
     - name: Read variables from vars.yml
       include_vars:
