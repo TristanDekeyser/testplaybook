@@ -1,0 +1,11 @@
+- name: Toon de gebruiker die het playbook uitvoert
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Haal de huidige gebruiker op
+      command: whoami
+      register: current_user
+
+    - name: Toon de uitvoerende gebruiker
+      debug:
+        msg: "Het playbook wordt uitgevoerd door gebruiker: {{ current_user.stdout }}"
