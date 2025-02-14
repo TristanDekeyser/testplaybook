@@ -1,8 +1,6 @@
 ---
 - name: Clone or pull GitHub repo and read variables
   hosts: localhost
-  vars_files:
-    - vars.yml
 
   tasks:
     - name: Ensure git is installed
