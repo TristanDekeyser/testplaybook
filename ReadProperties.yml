@@ -21,7 +21,7 @@
         dest: .
         version: main
       when: not repo_exists.stat.exists
-x
+
     - name: Pull the latest changes if the repository exists
       git:
         repo: "git@git.is4u.be:stage/stage-2025-ansible-tower/client-configurations.git"
