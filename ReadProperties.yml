@@ -1,4 +1,3 @@
----
 - name: Clone or pull GitHub repo and read variables
   hosts: localhost
 
@@ -18,14 +17,16 @@
     - name: Pull the latest changes if the repository exists
       git:
         repo: "git@git.is4u.be:stage/stage-2025-ansible-tower/client-configurations.git"
-        dest: /tmp/client-configuration
+        dest: /tmp/client_configuration
         version: main
         update: yes
       when: repo_exists.stat.exists
+      register: git_pull_result
 
     - name: Read variables from vars.yml
       include_vars:
         file: /tmp/client_configuration/DEV/testClient.yml
+      when: git_pull_result.changed # Alleen als er veranderingen zijn opgehaald
 
     - name: Display variables
       debug:
@@ -38,3 +39,4 @@
           - "Client Secret: {{ client_secret }}"
           - "Require PKCE: {{ require_pkce }}"
           - "Ext Properties: {{ extProperties }}"
+      when: git_pull_result.changed # Alleen als er veranderingen zijn opgehaald
