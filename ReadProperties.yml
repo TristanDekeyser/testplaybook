@@ -23,20 +23,30 @@
       when: repo_exists.stat.exists
       register: git_pull_result
 
-    - name: Read variables from vars.yml
-      include_vars:
-        file: /tmp/client_configuration/DEV/testClient.yml
-      when: git_pull_result.changed # Alleen als er veranderingen zijn opgehaald
+    - name: Find all YAML files in DEV folder
+      find:
+        paths: /tmp/client_configuration/DEV
+        patterns: "*.yml"
+      register: yaml_files
+      when: git_pull_result.changed # Alleen als er wijzigingen zijn opgehaald
 
-    - name: Display variables
+    - name: Read and display variables from each YAML file
+      include_vars:
+        file: "{{ item.path }}"
+      loop: "{{ yaml_files.files }}"
+      when: git_pull_result.changed # Alleen als er wijzigingen zijn opgehaald
+
+    - name: Display variables for each file
       debug:
         msg:
-          - "Client Name: {{ client_name }}"
-          - "Definition Name: {{ definition_name }}"
-          - "Company Name: {{ company_name }}"
-          - "Redirect URIs: {{ redirect_uri }}"
-          - "Client ID: {{ client_id }}"
-          - "Client Secret: {{ client_secret }}"
-          - "Require PKCE: {{ require_pkce }}"
-          - "Ext Properties: {{ extProperties }}"
-      when: git_pull_result.changed # Alleen als er veranderingen zijn opgehaald
+          - "File: {{ item.path }}"
+          - "Client Name: {{ client_name | default('N/A') }}"
+          - "Definition Name: {{ definition_name | default('N/A') }}"
+          - "Company Name: {{ company_name | default('N/A') }}"
+          - "Redirect URIs: {{ redirect_uri | default('N/A') }}"
+          - "Client ID: {{ client_id | default('N/A') }}"
+          - "Client Secret: {{ client_secret | default('N/A') }}"
+          - "Require PKCE: {{ require_pkce | default('N/A') }}"
+          - "Ext Properties: {{ extProperties | default('N/A') }}"
+      loop: "{{ yaml_files.files }}"
+      when: git_pull_result.changed # Alleen als er wijzigingen zijn opgehaald
