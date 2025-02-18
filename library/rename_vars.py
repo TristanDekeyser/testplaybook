@@ -4,28 +4,21 @@ from ansible.module_utils.basic import AnsibleModule
 import yaml
 import os
 
-# Mapping van de originele variabelen naar de gewenste Ansible variabelennamen
-VAR_MAPPING = {
-    "client_id": "add_oauth_client_clientId",
-    "client_name": "add_oauth_client_name",
-    "client_secret": "add_oauth_client_clientSecret",
-    "company_name": "add_oauth_client_companyName",
-    "definition_name": "add_oauth_client_definitionName",
-    "extProperties": "add_oauth_client_extProperties",
-    "redirect_uri": "add_oauth_client_redirectUri",
-    "require_pkce": "add_oauth_client_requirePkce"
-}
+# Functie om variabelen om te zetten naar het juiste Ansible formaat
+def transform_variable_name(original_name):
+    """Zet een originele variabelenaam om naar het Ansible formaat."""
+    return f"add_oauth_client_{original_name}" if not original_name.startswith("add_oauth_client_") else original_name
 
 def rename_variables(data):
-    """Zet de originele variabelen om naar de nieuwe namen volgens VAR_MAPPING."""
+    """Herschrijft alle variabelen volgens het Ansible-formaat."""
     renamed_data = {}
     for key, value in data.items():
-        new_key = VAR_MAPPING.get(key, key)  # Vervang met nieuwe naam als beschikbaar
+        new_key = transform_variable_name(key)  # Zet naam om
         renamed_data[new_key] = value
     return renamed_data
 
 def read_and_transform_yaml(file_path):
-    """Leest een YAML-bestand, transformeert de variabelen en geeft ze terug."""
+    """Leest een YAML-bestand en transformeert de variabelen."""
     if not os.path.exists(file_path):
         return None, f"Bestand niet gevonden: {file_path}"
     
