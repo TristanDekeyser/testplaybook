@@ -15,32 +15,37 @@
       when: not repo_exists.stat.exists
 
     - name: Pull the latest changes if the repository exists
-      git:
-        repo: "git@git.is4u.be:stage/stage-2025-ansible-tower/client-configurations.git"
-        dest: /tmp/client_configuration
-        version: main
-        update: yes
-      when: repo_exists.stat.exists
+      command: git -C /tmp/client_configuration pull
       register: git_pull_result
+      when: repo_exists.stat.exists
+      changed_when: "'Already up to date.' not in git_pull_result.stdout"
 
-    - name: Find all YAML files in DEV folder
-      find:
-        paths: /tmp/client_configuration/DEV
-        patterns: "*.yml"
-      register: yaml_files
-      # when: git_pull_result.changed
+    - name: Determine created, updated, and deleted files (only if pull changed)
+      set_fact:
+        created_files: "{{ git_pull_result.stdout_lines | select('search', '^\\s*create mode') | map('regex_replace', '^\\s*create mode \\d+\\s+', '') | list }}"
+        updated_files: "{{ git_pull_result.stdout_lines | select('search', '^\\s*M\\s+') | map('regex_replace', '^\\s*M\\s+', '') | list }}"
+        deleted_files: "{{ git_pull_result.stdout_lines | select('search', '^\\s*delete mode') | map('regex_replace', '^\\s*delete mode \\d+\\s+', '') | list }}"
+      when: git_pull_result.changed
 
-    - name: Read and display variables from each YAML file
+    - name: Display created, updated, and deleted files (only if pull changed)
       debug:
         msg:
-          - "File: {{ item.path }}"
-          - "Client Name: {{ (lookup('file', item.path) | from_yaml).client_name | default('N/A') }}"
-          - "Definition Name: {{ (lookup('file', item.path) | from_yaml).definition_name | default('N/A') }}"
-          - "Company Name: {{ (lookup('file', item.path) | from_yaml).company_name | default('N/A') }}"
-          - "Redirect URIs: {{ (lookup('file', item.path) | from_yaml).redirect_uri | default('N/A') }}"
-          - "Client ID: {{ (lookup('file', item.path) | from_yaml).client_id | default('N/A') }}"
-          - "Client Secret: {{ (lookup('file', item.path) | from_yaml).client_secret | default('N/A') }}"
-          - "Require PKCE: {{ (lookup('file', item.path) | from_yaml).require_pkce | default('N/A') }}"
-          - "Ext Properties: {{ (lookup('file', item.path) | from_yaml).extProperties | default('N/A') }}"
-      loop: "{{ yaml_files.files }}"
-      # when: git_pull_result.changed
+          - "Created Files: {{ created_files }}"
+          - "Updated Files: {{ updated_files }}"
+          - "Deleted Files: {{ deleted_files }}"
+      when: git_pull_result.changed
+
+    - name: Read and display variables for updated and created files
+      debug:
+        msg:
+          - "File: {{ item }}"
+          - "Client Name: {{ (lookup('file', '/tmp/client_configuration/' + item) | from_yaml).client_name | default('N/A') }}"
+          - "Definition Name: {{ (lookup('file', '/tmp/client_configuration/' + item) | from_yaml).definition_name | default('N/A') }}"
+          - "Company Name: {{ (lookup('file', '/tmp/client_configuration/' + item) | from_yaml).company_name | default('N/A') }}"
+          - "Redirect URIs: {{ (lookup('file', '/tmp/client_configuration/' + item) | from_yaml).redirect_uri | default('N/A') }}"
+          - "Client ID: {{ (lookup('file', '/tmp/client_configuration/' + item) | from_yaml).client_id | default('N/A') }}"
+          - "Client Secret: {{ (lookup('file', '/tmp/client_configuration/' + item) | from_yaml).client_secret | default('N/A') }}"
+          - "Require PKCE: {{ (lookup('file', '/tmp/client_configuration/' + item) | from_yaml).require_pkce | default('N/A') }}"
+          - "Ext Properties: {{ (lookup('file', '/tmp/client_configuration/' + item) | from_yaml).extProperties | default('N/A') }}"
+      loop: "{{ created_files + updated_files }}"
+      when: git_pull_result.changed
