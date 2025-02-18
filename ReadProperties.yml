@@ -28,13 +28,13 @@
         paths: /tmp/client_configuration/DEV
         patterns: "*.yml"
       register: yaml_files
-      when: git_pull_result.changed # Alleen als er wijzigingen zijn opgehaald
+      # when: git_pull_result.changed
 
     - name: Read and display variables from each YAML file
       include_vars:
         file: "{{ item.path }}"
       loop: "{{ yaml_files.files }}"
-      when: git_pull_result.changed # Alleen als er wijzigingen zijn opgehaald
+      # when: git_pull_result.changed
 
     - name: Display variables for each file
       debug:
@@ -49,4 +49,4 @@
           - "Require PKCE: {{ require_pkce | default('N/A') }}"
           - "Ext Properties: {{ extProperties | default('N/A') }}"
       loop: "{{ yaml_files.files }}"
-      when: git_pull_result.changed # Alleen als er wijzigingen zijn opgehaald
+      # when: git_pull_result.changed
