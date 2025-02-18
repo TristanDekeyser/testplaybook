@@ -49,5 +49,5 @@
 
     - name: Display all clients' information in pretty JSON
       debug:
-        msg: "{{ clients | to_nice_json }}"
+        msg: "{{ clients }}"
       when: git_pull_result.changed
