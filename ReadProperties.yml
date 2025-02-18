@@ -31,22 +31,16 @@
       # when: git_pull_result.changed
 
     - name: Read and display variables from each YAML file
-      include_vars:
-        file: "{{ item.path }}"
-      loop: "{{ yaml_files.files }}"
-      # when: git_pull_result.changed
-
-    - name: Display variables for each file
       debug:
         msg:
           - "File: {{ item.path }}"
-          - "Client Name: {{ client_name | default('N/A') }}"
-          - "Definition Name: {{ definition_name | default('N/A') }}"
-          - "Company Name: {{ company_name | default('N/A') }}"
-          - "Redirect URIs: {{ redirect_uri | default('N/A') }}"
-          - "Client ID: {{ client_id | default('N/A') }}"
-          - "Client Secret: {{ client_secret | default('N/A') }}"
-          - "Require PKCE: {{ require_pkce | default('N/A') }}"
-          - "Ext Properties: {{ extProperties | default('N/A') }}"
+          - "Client Name: {{ (lookup('file', item.path) | from_yaml).client_name | default('N/A') }}"
+          - "Definition Name: {{ (lookup('file', item.path) | from_yaml).definition_name | default('N/A') }}"
+          - "Company Name: {{ (lookup('file', item.path) | from_yaml).company_name | default('N/A') }}"
+          - "Redirect URIs: {{ (lookup('file', item.path) | from_yaml).redirect_uri | default('N/A') }}"
+          - "Client ID: {{ (lookup('file', item.path) | from_yaml).client_id | default('N/A') }}"
+          - "Client Secret: {{ (lookup('file', item.path) | from_yaml).client_secret | default('N/A') }}"
+          - "Require PKCE: {{ (lookup('file', item.path) | from_yaml).require_pkce | default('N/A') }}"
+          - "Ext Properties: {{ (lookup('file', item.path) | from_yaml).extProperties | default('N/A') }}"
       loop: "{{ yaml_files.files }}"
       # when: git_pull_result.changed
