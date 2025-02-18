@@ -41,13 +41,20 @@
       set_fact:
         clients: []
 
-    - name: Read variables for updated and created files and store them in a list
-      set_fact:
-        clients: "{{ clients + [ {'file': item, 'vars': lookup('file', '/tmp/client_configuration/' + item) | from_yaml } ] }}"
+    - name: Read and transform variables for updated and created files
+      rename_vars:
+        file_path: "/tmp/client_configuration/{{ item }}"
+      register: transformed_clients
       loop: "{{ created_files + updated_files }}"
       when: git_pull_result.changed
 
-    - name: Display all clients' information in pretty JSON
+    - name: Store transformed variables in clients list
+      set_fact:
+        clients: "{{ clients + [ {'file': item.item, 'vars': item.transformed_vars} ] }}"
+      loop: "{{ transformed_clients.results }}"
+      when: git_pull_result.changed
+
+    - name: Display all transformed clients' information in pretty JSON
       debug:
         msg: "{{ clients }}"
       when: git_pull_result.changed
