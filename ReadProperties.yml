@@ -34,10 +34,7 @@
 
     - name: Display created, updated, and deleted files (only if pull changed)
       debug:
-        msg:
-          - "Created Files: {{ created_files }}"
-          - "Updated Files: {{ updated_files }}"
-          - "Deleted Files: {{ deleted_files }}"
+        msg: "{{ {'Created Files': created_files, 'Updated Files': updated_files, 'Deleted Files': deleted_files} | to_nice_json }}"
       when: git_pull_result.changed
 
     - name: Initialize empty clients list
@@ -50,17 +47,7 @@
       loop: "{{ created_files + updated_files }}"
       when: git_pull_result.changed
 
-    - name: Display all clients' information
+    - name: Display all clients' information in pretty JSON
       debug:
-        msg: |
-          File: {{ item.file }}
-          Client Name: {{ item.vars.client_name | default('N/A') }}
-          Definition Name: {{ item.vars.definition_name | default('N/A') }}
-          Company Name: {{ item.vars.company_name | default('N/A') }}
-          Redirect URIs: {{ item.vars.redirect_uri | default('N/A') }}
-          Client ID: {{ item.vars.client_id | default('N/A') }}
-          Client Secret: {{ item.vars.client_secret | default('N/A') }}
-          Require PKCE: {{ item.vars.require_pkce | default('N/A') }}
-          Ext Properties: {{ item.vars.extProperties | default('N/A') }}
-      loop: "{{ clients }}"
+        msg: "{{ clients | to_nice_json }}"
       when: git_pull_result.changed
