@@ -20,11 +20,16 @@
       when: repo_exists.stat.exists
       changed_when: "'Already up to date.' not in git_pull_result.stdout"
 
-    - name: Determine created, updated, and deleted files (only if pull changed)
+    - name: Get list of created, updated, and deleted files (only if pull changed)
+      command: git -C /tmp/client_configuration diff --name-status HEAD~1 HEAD
+      register: git_diff_result
+      when: git_pull_result.changed
+
+    - name: Parse git diff output
       set_fact:
-        created_files: "{{ git_pull_result.stdout_lines | select('search', '^\\s*create mode') | map('regex_replace', '^\\s*create mode \\d+\\s+', '') | list }}"
-        updated_files: "{{ git_pull_result.stdout_lines | select('search', '^\\s*M\\s+') | map('regex_replace', '^\\s*M\\s+', '') | list }}"
-        deleted_files: "{{ git_pull_result.stdout_lines | select('search', '^\\s*delete mode') | map('regex_replace', '^\\s*delete mode \\d+\\s+', '') | list }}"
+        created_files: "{{ git_diff_result.stdout_lines | select('search', '^A\\s+') | map('regex_replace', '^A\\s+', '') | list }}"
+        updated_files: "{{ git_diff_result.stdout_lines | select('search', '^M\\s+') | map('regex_replace', '^M\\s+', '') | list }}"
+        deleted_files: "{{ git_diff_result.stdout_lines | select('search', '^D\\s+') | map('regex_replace', '^D\\s+', '') | list }}"
       when: git_pull_result.changed
 
     - name: Display created, updated, and deleted files (only if pull changed)
