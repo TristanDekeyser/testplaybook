@@ -34,7 +34,7 @@
 
     - name: Display created, updated, and deleted files (only if pull changed)
       debug:
-        msg: "{{ {'Created Files': created_files, 'Updated Files': updated_files, 'Deleted Files': deleted_files} | to_nice_json }}"
+        msg: "{{ {'Created Files': created_files, 'Updated Files': updated_files, 'Deleted Files': deleted_files} }}"
       when: git_pull_result.changed
 
     - name: Initialize empty clients list
