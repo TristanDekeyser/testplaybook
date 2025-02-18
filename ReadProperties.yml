@@ -40,17 +40,27 @@
           - "Deleted Files: {{ deleted_files }}"
       when: git_pull_result.changed
 
-    - name: Read and display variables for updated and created files
-      debug:
-        msg:
-          - "File: {{ item }}"
-          - "Client Name: {{ (lookup('file', '/tmp/client_configuration/' + item) | from_yaml).client_name | default('N/A') }}"
-          - "Definition Name: {{ (lookup('file', '/tmp/client_configuration/' + item) | from_yaml).definition_name | default('N/A') }}"
-          - "Company Name: {{ (lookup('file', '/tmp/client_configuration/' + item) | from_yaml).company_name | default('N/A') }}"
-          - "Redirect URIs: {{ (lookup('file', '/tmp/client_configuration/' + item) | from_yaml).redirect_uri | default('N/A') }}"
-          - "Client ID: {{ (lookup('file', '/tmp/client_configuration/' + item) | from_yaml).client_id | default('N/A') }}"
-          - "Client Secret: {{ (lookup('file', '/tmp/client_configuration/' + item) | from_yaml).client_secret | default('N/A') }}"
-          - "Require PKCE: {{ (lookup('file', '/tmp/client_configuration/' + item) | from_yaml).require_pkce | default('N/A') }}"
-          - "Ext Properties: {{ (lookup('file', '/tmp/client_configuration/' + item) | from_yaml).extProperties | default('N/A') }}"
+    - name: Initialize empty clients list
+      set_fact:
+        clients: []
+
+    - name: Read variables for updated and created files and store them in a list
+      set_fact:
+        clients: "{{ clients + [ {'file': item, 'vars': lookup('file', '/tmp/client_configuration/' + item) | from_yaml } ] }}"
       loop: "{{ created_files + updated_files }}"
+      when: git_pull_result.changed
+
+    - name: Display all clients' information
+      debug:
+        msg: |
+          File: {{ item.file }}
+          Client Name: {{ item.vars.client_name | default('N/A') }}
+          Definition Name: {{ item.vars.definition_name | default('N/A') }}
+          Company Name: {{ item.vars.company_name | default('N/A') }}
+          Redirect URIs: {{ item.vars.redirect_uri | default('N/A') }}
+          Client ID: {{ item.vars.client_id | default('N/A') }}
+          Client Secret: {{ item.vars.client_secret | default('N/A') }}
+          Require PKCE: {{ item.vars.require_pkce | default('N/A') }}
+          Ext Properties: {{ item.vars.extProperties | default('N/A') }}
+      loop: "{{ clients }}"
       when: git_pull_result.changed
