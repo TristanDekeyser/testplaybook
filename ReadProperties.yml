@@ -72,6 +72,9 @@
 - name: Voeg een OAuth-client toe aan IBM ISAM
   hosts: isam
   gather_facts: no
+  vars:
+    # Zorgen dat global_git_pull_result altijd gedefinieerd is
+    global_git_pull_result: "{{ global_git_pull_result | default({}) }}"
 
   tasks:
     - name: Add OAuth client based on the transformed variables
@@ -79,4 +82,4 @@
         name: ibm.isam.add_oauth_client
       vars:
         oauth_clients: "{{ global_clients }}"
-      when: global_git_pull_result.changed
+      when: global_git_pull_result.changed | default(false) # Dit voorkomt fouten als de variabele niet gedefinieerd is
