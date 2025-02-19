@@ -1,3 +1,4 @@
+---
 - name: Clone or pull GitHub repo and read variables
   hosts: localhost
 
@@ -58,3 +59,14 @@
       debug:
         msg: "{{ clients }}"
       when: git_pull_result.changed
+
+- name: Voeg een OAuth-client toe aan IBM ISAM
+  hosts: isam
+  gather_facts: no
+
+  tasks:
+    - name: Add OAuth client based on the transformed variables
+      ansible.builtin.include_role:
+        name: ibm.isam.add_oauth_client
+      vars:
+        oauth_clients: "{{ clients }}"
