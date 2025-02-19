@@ -75,24 +75,6 @@
   gather_facts: no
 
   tasks:
-    - name: Ensure pip is installed
-      ansible.builtin.package:
-        name: python3-pip
-        state: present
-      become: yes
-
-    - name: Upgrade Ansible
-      ansible.builtin.pip:
-        name: ansible
-        state: latest
-      become: yes
-
-    - name: Install ibmsecurity module
-      ansible.builtin.pip:
-        name: ibmsecurity
-        state: latest
-      become: yes
-
     - name: Load global variables from file
       set_fact:
         global_git_pull_result: "{{ lookup('file', '/tmp/git_pull_result.json') | from_json }}"
