@@ -86,21 +86,14 @@
         formatted_oauth_clients: >-
           {{
             global_clients | map(attribute='vars') | list | map('dict2items') |
-            map('map', {
-              'key': 'key | regex_replace("add_oauth_client_client_", "add_oauth_client_")',
-              'value': 'value'
-            }) |
-            map('items2dict') | list |
-            map('combine', {
-              'add_oauth_client_name': item.add_oauth_client_name,
-              'add_oauth_client_definitionName': item.add_oauth_client_definition_name,
-              'add_oauth_client_companyName': item.add_oauth_client_company_name,
-              'add_oauth_client_redirectUri': item.add_oauth_client_redirect_uri,
-              'add_oauth_client_clientId': item.add_oauth_client_id,
-              'add_oauth_client_clientSecret': item.add_oauth_client_secret,
-              'add_oauth_client_requirePkce': item.add_oauth_client_require_pkce
-            }) | list
+            map('list') |
+            map('map', {'key': 'item.key | regex_replace("add_oauth_client_client_", "add_oauth_client_")', 'value': 'item.value'}) |
+            map('items2dict') | list
           }}
+
+    - name: Debug - Controleer de getransformeerde OAuth-variabelen
+      debug:
+        msg: "{{ formatted_oauth_clients }}"
 
     - name: Debug - Controleer de getransformeerde OAuth-variabelen
       debug:
