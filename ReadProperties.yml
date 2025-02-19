@@ -60,24 +60,15 @@
         msg: "{{ clients }}"
       when: git_pull_result.changed
 
-    # Sla de waarde van git_pull_result en clients op als globale variabele
-    - name: Set fact for git_pull_result
-      set_fact:
-        global_git_pull_result: "{{ git_pull_result }}"
-
-    - name: Set fact for clients
-      set_fact:
-        global_clients: "{{ clients }}"
-
     - name: Save global variables to a file
       copy:
-        content: "{{ global_git_pull_result | to_json }}"
-        dest: /tmp/global_git_pull_result.json
+        content: "{{ git_pull_result | to_json }}"
+        dest: /tmp/git_pull_result.json
 
     - name: Save clients to a file
       copy:
-        content: "{{ global_clients | to_json }}"
-        dest: /tmp/global_clients.json
+        content: "{{ clients | to_json }}"
+        dest: /tmp/clients.json
 
 - name: Voeg een OAuth-client toe aan IBM ISAM
   hosts: isam
@@ -86,8 +77,8 @@
   tasks:
     - name: Load global variables from file
       set_fact:
-        global_git_pull_result: "{{ lookup('file', '/tmp/global_git_pull_result.json') | from_json }}"
-        global_clients: "{{ lookup('file', '/tmp/global_clients.json') | from_json }}"
+        global_git_pull_result: "{{ lookup('file', '/tmp/git_pull_result.json') | from_json }}"
+        global_clients: "{{ lookup('file', '/tmp/clients.json') | from_json }}"
 
     - name: Add OAuth client based on the transformed variables
       ansible.builtin.include_role:
