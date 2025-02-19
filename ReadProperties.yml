@@ -71,7 +71,7 @@
         dest: /tmp/clients.json
 
 - name: Voeg een OAuth-client toe aan IBM ISAM
-  hosts: isam
+  hosts: localhost
   gather_facts: no
 
   tasks:
