@@ -85,11 +85,18 @@
       set_fact:
         formatted_oauth_clients: >-
           {{
-            global_clients | map(attribute='vars') | list | map('dict2items') |
-            map('list') |
-            map('map', {'key': 'item.key | regex_replace("add_oauth_client_client_", "add_oauth_client_")', 'value': 'item.value'}) |
-            map('items2dict') | list
+            global_clients | map(attribute='vars') 
+            | map('dict2items') 
+            | map('map', 
+                {'key': 'item.key | regex_replace(\"add_oauth_client_client_\", \"add_oauth_client_\")', 
+                 'value': 'item.value'}) 
+            | map('items2dict') 
+            | list
           }}
+
+    - name: Debug - Controleer de getransformeerde OAuth-variabelen
+      debug:
+        msg: "{{ formatted_oauth_clients }}"
 
     - name: Debug - Controleer de getransformeerde OAuth-variabelen
       debug:
