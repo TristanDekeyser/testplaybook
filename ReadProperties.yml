@@ -75,10 +75,6 @@
   gather_facts: no
 
   tasks:
-    - name: Install required collections
-      ansible.builtin.command: ansible-galaxy collection install ibm.isam --force
-      become: yes
-
     - name: Load global variables from file
       set_fact:
         global_git_pull_result: "{{ lookup('file', '/tmp/git_pull_result.json') | from_json }}"
