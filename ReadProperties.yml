@@ -70,3 +70,4 @@
         name: ibm.isam.add_oauth_client
       vars:
         oauth_clients: "{{ clients }}"
+      when: git_pull_result.changed
