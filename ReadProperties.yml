@@ -97,8 +97,8 @@
               'add_oauth_client_definitionName': item.definition_name,
               'add_oauth_client_companyName': item.company_name,
               'add_oauth_client_redirectUri': item.redirect_uri,
-              'add_oauth_client_clientId': item.client_id,
-              'add_oauth_client_clientSecret': item.client_secret,
+              'add_oauth_client_Id': item.client_id,
+              'add_oauth_client_Secret': item.client_secret,
               'add_oauth_client_requirePkce': item.require_pkce
             }) | list
           }}
