@@ -29,23 +29,23 @@
       set_fact:
         created_files: "{{ git_diff_result.stdout_lines | select('search', '^A\\s+') | map('regex_replace', '^A\\s+', '') | list }}"
         updated_files: "{{ git_diff_result.stdout_lines | select('search', '^M\\s+') | map('regex_replace', '^M\\s+', '') | list }}"
-        deleted_files: "{{ git_diff_result.stdout_lines | select('search', '^D\\s+') | map('regex_replace', '^D\\s+', '') | list }}"
       when: git_pull_result.changed
 
     - name: Toon gewijzigde bestanden (debug)
       debug:
-        msg: "{{ {'Created Files': created_files, 'Updated Files': updated_files, 'Deleted Files': deleted_files} }}"
+        msg: "{{ {'Created Files': created_files, 'Updated Files': updated_files} }}"
       when: git_pull_result.changed
 
-    - name: Transformeer client-configuraties via Python-module
-      command: "/usr/bin/python3 /path/to/your_python_module.py {{ item }}"
+    - name: Lees en transformeer variabelen voor gewijzigde bestanden
+      rename_vars:
+        file_path: "/tmp/client_configuration/{{ item }}"
       register: transformed_clients
       loop: "{{ created_files + updated_files }}"
       when: git_pull_result.changed
 
     - name: Sla getransformeerde clients op
       set_fact:
-        clients: "{{ transformed_clients.results | map(attribute='stdout') | map('from_json') | list }}"
+        clients: "{{ transformed_clients.results | map(attribute='transformed_vars') | list }}"
       when: git_pull_result.changed
 
     - name: Bewaar de client-configuratie in een bestand
