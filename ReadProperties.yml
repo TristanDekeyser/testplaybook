@@ -85,4 +85,4 @@
         name: ibm.isam.add_oauth_client
       vars:
         oauth_clients: "{{ global_clients }}"
-      # when: global_git_pull_result.changed
+      when: global_git_pull_result.changed
