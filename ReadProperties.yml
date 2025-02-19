@@ -44,15 +44,15 @@
         clients: []
 
     - name: Read and transform variables for updated and created files
-      rename_vars:
-        file_path: "/tmp/client_configuration/{{ item }}"
+      include_vars:
+        file: "/tmp/client_configuration/{{ item }}"
       register: transformed_clients
       loop: "{{ created_files + updated_files }}"
       when: git_pull_result.changed
 
     - name: Store transformed variables in clients list
       set_fact:
-        clients: "{{ clients + [ {'file': item.item, 'vars': item.transformed_vars} ] }}"
+        clients: "{{ clients + [ {'file': item.item, 'vars': item.ansible_facts} ] }}"
       loop: "{{ transformed_clients.results }}"
       when: git_pull_result.changed
 
@@ -81,25 +81,24 @@
         global_git_pull_result: "{{ lookup('file', '/tmp/git_pull_result.json') | from_json }}"
         global_clients: "{{ lookup('file', '/tmp/clients.json') | from_json }}"
 
-    - name: Debug - Controleer de ingeladen clients data
-      debug:
-        msg: "{{ global_clients }}"
-
     - name: Transformeer OAuth-client variabelen naar correct formaat
       set_fact:
         formatted_oauth_clients: >-
           {{
             global_clients | map(attribute='vars') | list | map('dict2items') |
-            map('map', {'key': 'key | regex_replace("add_oauth_client_", "")', 'value': 'value'}) |
-            map('items2dict') |
+            map('map', {
+              'key': 'key | regex_replace("add_oauth_client_client_", "add_oauth_client_")',
+              'value': 'value'
+            }) |
+            map('items2dict') | list |
             map('combine', {
-              'add_oauth_client_name': item.name,
-              'add_oauth_client_definitionName': item.definition_name,
-              'add_oauth_client_companyName': item.company_name,
-              'add_oauth_client_redirectUri': item.redirect_uri,
-              'add_oauth_client_Id': item.client_id,
-              'add_oauth_client_Secret': item.client_secret,
-              'add_oauth_client_requirePkce': item.require_pkce
+              'add_oauth_client_name': item.add_oauth_client_name,
+              'add_oauth_client_definitionName': item.add_oauth_client_definition_name,
+              'add_oauth_client_companyName': item.add_oauth_client_company_name,
+              'add_oauth_client_redirectUri': item.add_oauth_client_redirect_uri,
+              'add_oauth_client_clientId': item.add_oauth_client_id,
+              'add_oauth_client_clientSecret': item.add_oauth_client_secret,
+              'add_oauth_client_requirePkce': item.add_oauth_client_require_pkce
             }) | list
           }}
 
