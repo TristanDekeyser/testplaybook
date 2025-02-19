@@ -71,10 +71,14 @@
         dest: /tmp/clients.json
 
 - name: Voeg een OAuth-client toe aan IBM ISAM
-  hosts: localhost
+  hosts: isam
   gather_facts: no
 
   tasks:
+    - name: Install required collections
+      ansible.builtin.command: ansible-galaxy collection install -r requirements.yml
+      become: yes
+
     - name: Load global variables from file
       set_fact:
         global_git_pull_result: "{{ lookup('file', '/tmp/git_pull_result.json') | from_json }}"
