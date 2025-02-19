@@ -1,89 +1,68 @@
 ---
-- name: Clone or pull GitHub repo and read variables
+- name: Clone of update GitHub repo en lees variabelen
   hosts: localhost
-  gather_facts: no
-
   tasks:
-    - name: Check if the repository exists
+    - name: Controleer of de repository al bestaat
       stat:
         path: /tmp/client_configuration
       register: repo_exists
 
-    - name: Clone the GitHub repository
+    - name: Clone de GitHub repository indien nodig
       git:
         repo: "git@git.is4u.be:stage/stage-2025-ansible-tower/client-configurations.git"
         dest: /tmp/client_configuration
         version: main
       when: not repo_exists.stat.exists
 
-    - name: Pull the latest changes if the repository exists
+    - name: Pull de laatste wijzigingen
       command: git -C /tmp/client_configuration pull
       register: git_pull_result
       when: repo_exists.stat.exists
       changed_when: "'Already up to date.' not in git_pull_result.stdout"
 
-    - name: Get list of created, updated, and deleted files (only if pull changed)
+    - name: Bepaal gewijzigde bestanden (alleen bij wijzigingen)
       command: git -C /tmp/client_configuration diff --name-status HEAD~1 HEAD
       register: git_diff_result
       when: git_pull_result.changed
 
-    - name: Parse git diff output
+    - name: Parse gewijzigde bestanden
       set_fact:
         created_files: "{{ git_diff_result.stdout_lines | select('search', '^A\\s+') | map('regex_replace', '^A\\s+', '') | list }}"
         updated_files: "{{ git_diff_result.stdout_lines | select('search', '^M\\s+') | map('regex_replace', '^M\\s+', '') | list }}"
         deleted_files: "{{ git_diff_result.stdout_lines | select('search', '^D\\s+') | map('regex_replace', '^D\\s+', '') | list }}"
       when: git_pull_result.changed
 
-    - name: Display created, updated, and deleted files (only if pull changed)
+    - name: Toon gewijzigde bestanden (debug)
       debug:
         msg: "{{ {'Created Files': created_files, 'Updated Files': updated_files, 'Deleted Files': deleted_files} }}"
       when: git_pull_result.changed
 
-    - name: Initialize empty clients list
-      set_fact:
-        clients: []
-
-    - name: Read and transform variables for updated and created files
-      include_vars:
-        file: "/tmp/client_configuration/{{ item }}"
+    - name: Transformeer client-configuraties via Python-module
+      command: "/usr/bin/python3 /path/to/your_python_module.py {{ item }}"
       register: transformed_clients
       loop: "{{ created_files + updated_files }}"
       when: git_pull_result.changed
 
-    - name: Store transformed variables in clients list
+    - name: Sla getransformeerde clients op
       set_fact:
-        clients: "{{ clients + [ {'file': item.item, 'vars': item.ansible_facts} ] }}"
-      loop: "{{ transformed_clients.results }}"
+        clients: "{{ transformed_clients.results | map(attribute='stdout') | map('from_json') | list }}"
       when: git_pull_result.changed
 
-    - name: Display all transformed clients' information in pretty JSON
-      debug:
-        msg: "{{ clients }}"
-      when: git_pull_result.changed
-
-    - name: Save global variables to a file
-      copy:
-        content: "{{ git_pull_result | to_json }}"
-        dest: /tmp/git_pull_result.json
-
-    - name: Save clients to a file
+    - name: Bewaar de client-configuratie in een bestand
       copy:
         content: "{{ clients | to_json }}"
         dest: /tmp/clients.json
 
-- name: Voeg een OAuth-client toe aan IBM ISAM
+- name: Voeg OAuth-clients toe aan IBM ISAM
   hosts: isam
   gather_facts: no
-
   tasks:
-    - name: Load global variables from file
+    - name: Laad getransformeerde clients in
       set_fact:
-        global_git_pull_result: "{{ lookup('file', '/tmp/git_pull_result.json') | from_json }}"
         global_clients: "{{ lookup('file', '/tmp/clients.json') | from_json }}"
 
-    - name: Add OAuth client based on the transformed variables
+    - name: Voeg OAuth-client toe met juiste variabelen
       ansible.builtin.include_role:
         name: ibm.isam.add_oauth_client
       vars:
-        oauth_clients: "{{ formatted_oauth_clients }}"
-      when: global_git_pull_result.changed
+        oauth_clients: "{{ global_clients }}"
