@@ -89,15 +89,18 @@
       set_fact:
         formatted_oauth_clients: >-
           {{
-            global_clients | map(attribute='vars') | list |
-            map('combine', {'add_oauth_client_name': item.add_oauth_client_client_name | default(''),
-                            'add_oauth_client_definitionName': item.add_oauth_client_definition_name | default(''),
-                            'add_oauth_client_companyName': item.add_oauth_client_company_name | default(''),
-                            'add_oauth_client_redirectUri': item.add_oauth_client_redirect_uri | default([]),
-                            'add_oauth_client_clientId': item.add_oauth_client_client_id | default(''),
-                            'add_oauth_client_clientSecret': item.add_oauth_client_client_secret | default(''),
-                            'add_oauth_client_requirePkce': item.add_oauth_client_require_pkce | default(false)
-                          }) | list
+            global_clients | map(attribute='vars') | list | map('dict2items') |
+            map('map', {'key': 'key | regex_replace("add_oauth_client_", "")', 'value': 'value'}) |
+            map('items2dict') |
+            map('combine', {
+              'add_oauth_client_name': item.name,
+              'add_oauth_client_definitionName': item.definition_name,
+              'add_oauth_client_companyName': item.company_name,
+              'add_oauth_client_redirectUri': item.redirect_uri,
+              'add_oauth_client_clientId': item.client_id,
+              'add_oauth_client_clientSecret': item.client_secret,
+              'add_oauth_client_requirePkce': item.require_pkce
+            }) | list
           }}
 
     - name: Debug - Controleer de getransformeerde OAuth-variabelen
