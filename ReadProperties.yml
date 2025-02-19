@@ -60,6 +60,15 @@
         msg: "{{ clients }}"
       when: git_pull_result.changed
 
+    # Sla de waarde van git_pull_result en clients op als globale variabele
+    - name: Set fact for git_pull_result
+      set_fact:
+        global_git_pull_result: "{{ git_pull_result }}"
+
+    - name: Set fact for clients
+      set_fact:
+        global_clients: "{{ clients }}"
+
 - name: Voeg een OAuth-client toe aan IBM ISAM
   hosts: isam
   gather_facts: no
@@ -69,5 +78,5 @@
       ansible.builtin.include_role:
         name: ibm.isam.add_oauth_client
       vars:
-        oauth_clients: "{{ clients }}"
-      when: git_pull_result.changed
+        oauth_clients: "{{ global_clients }}"
+      when: global_git_pull_result.changed
