@@ -1,6 +1,7 @@
 ---
 - name: Clone or pull GitHub repo and read variables
   hosts: localhost
+  gather_facts: no
 
   tasks:
     - name: Check if the repository exists
@@ -80,9 +81,32 @@
         global_git_pull_result: "{{ lookup('file', '/tmp/git_pull_result.json') | from_json }}"
         global_clients: "{{ lookup('file', '/tmp/clients.json') | from_json }}"
 
+    - name: Debug - Controleer de ingeladen clients data
+      debug:
+        msg: "{{ global_clients }}"
+
+    - name: Transformeer OAuth-client variabelen naar correct formaat
+      set_fact:
+        formatted_oauth_clients: >-
+          {{
+            global_clients | map(attribute='vars') | list |
+            map('combine', {'add_oauth_client_name': item.add_oauth_client_client_name | default(''),
+                            'add_oauth_client_definitionName': item.add_oauth_client_definition_name | default(''),
+                            'add_oauth_client_companyName': item.add_oauth_client_company_name | default(''),
+                            'add_oauth_client_redirectUri': item.add_oauth_client_redirect_uri | default([]),
+                            'add_oauth_client_clientId': item.add_oauth_client_client_id | default(''),
+                            'add_oauth_client_clientSecret': item.add_oauth_client_client_secret | default(''),
+                            'add_oauth_client_requirePkce': item.add_oauth_client_require_pkce | default(false)
+                          }) | list
+          }}
+
+    - name: Debug - Controleer de getransformeerde OAuth-variabelen
+      debug:
+        msg: "{{ formatted_oauth_clients }}"
+
     - name: Add OAuth client based on the transformed variables
       ansible.builtin.include_role:
         name: ibm.isam.add_oauth_client
       vars:
-        oauth_clients: "{{ global_clients }}"
-      # when: global_git_pull_result.changed
+        oauth_clients: "{{ formatted_oauth_clients }}"
+      when: global_git_pull_result.changed
