@@ -61,12 +61,8 @@
       set_fact:
         global_clients: "{{ lookup('file', '/tmp/clients.json') | from_json }}"
 
-    - name: Zet variabelen correct voor de role
-      set_fact:
-        fixed_clients: "{{ global_clients | map(attribute='|lower') | list }}"
-
     - name: Voeg OAuth-client toe met juiste variabelen
       ansible.builtin.include_role:
         name: ibm.isam.add_oauth_client
       vars:
-        oauth_clients: "{{ fixed_clients }}"
+        oauth_clients: "{{ global_clients }}"
