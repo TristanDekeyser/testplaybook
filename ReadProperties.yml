@@ -67,13 +67,13 @@
 
     - name: Haal de variabelen uit de lijst en stel ze in als afzonderlijke feiten
       set_fact:
-        add_oauth_clientId: "{{ global_clients_parsed[0].set_oauth_client_clientId }}"
-        add_oauth_clientSecret: "{{ global_clients_parsed[0].set_oauth_client_clientSecret }}"
-        add_oauth_client_companyName: "{{ global_clients_parsed[0].set_oauth_client_companyName }}"
-        add_oauth_client_definitionName: "{{ global_clients_parsed[0].set_oauth_client_definitionName }}"
-        add_oauth_client_name: "{{ global_clients_parsed[0].set_oauth_client_name }}"
-        add_oauth_client_redirectUri: "{{ global_clients_parsed[0].set_oauth_client_redirectUri }}"
-        add_oauth_client_requirePkce: "{{ global_clients_parsed[0].set_oauth_client_requirePkce }}"
+        set_oauth_clientId: "{{ global_clients_parsed[0].set_oauth_client_clientId }}"
+        set_oauth_clientSecret: "{{ global_clients_parsed[0].set_oauth_client_clientSecret }}"
+        set_oauth_client_companyName: "{{ global_clients_parsed[0].set_oauth_client_companyName }}"
+        set_oauth_client_definitionName: "{{ global_clients_parsed[0].set_oauth_client_definitionName }}"
+        set_oauth_client_name: "{{ global_clients_parsed[0].set_oauth_client_name }}"
+        set_oauth_client_redirectUri: "{{ global_clients_parsed[0].set_oauth_client_redirectUri }}"
+        set_oauth_client_requirePkce: "{{ global_clients_parsed[0].set_oauth_client_requirePkce }}"
 
     - name: Voeg OAuth-client toe met juiste variabelen
       vars:
