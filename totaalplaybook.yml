@@ -2,7 +2,7 @@
   hosts: machines
   gather_facts: yes
   become: yes
-  ignore_error: yes
+  ignore_errors: yes
 
 - name: Totaalverwerking van machines en variabelen
   hosts: localhost
