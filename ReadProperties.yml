@@ -62,7 +62,7 @@
         global_clients: "{{ lookup('file', '/tmp/clients.json') | from_json }}"
 
     - name: Voeg OAuth-client toe met juiste variabelen
-      ansible.builtin.include_role:
-        name: ibm.isam.add_oauth_client
       vars:
         oauth_clients: "{{ global_clients }}"
+      ansible.builtin.include_role:
+        name: ibm.isam.add_oauth_client
