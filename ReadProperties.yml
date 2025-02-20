@@ -79,4 +79,4 @@
       vars:
         oauth_clients: "{{ global_clients_parsed }}"
       ansible.builtin.include_role:
-        name: ibm.isam.add_oauth_client
+        name: ibm.isam.set_oauth_client
