@@ -65,8 +65,13 @@
       set_fact:
         global_clients_parsed: "{{ global_clients | map('from_yaml') | list }}"
 
-    - name: Stel variabelen in voor elke OAuth-client
-      set_fact:
+    - name: Voeg OAuth-client toe met juiste variabelen
+      ansible.builtin.include_role:
+        name: ibm.isam.set_oauth_client
+      loop: "{{ global_clients_parsed }}"
+      loop_control:
+        loop_var: client
+      vars:
         set_oauth_client_clientId: "{{ client.set_oauth_client_clientId }}"
         set_oauth_client_clientSecret: "{{ client.set_oauth_client_clientSecret }}"
         set_oauth_client_companyName: "{{ client.set_oauth_client_companyName }}"
@@ -74,13 +79,3 @@
         set_oauth_client_name: "{{ client.set_oauth_client_name }}"
         set_oauth_client_redirectUri: "{{ client.set_oauth_client_redirectUri }}"
         set_oauth_client_requirePkce: "{{ client.set_oauth_client_requirePkce }}"
-      loop: "{{ global_clients_parsed }}"
-      loop_control:
-        loop_var: client
-
-    - name: Voeg OAuth-client toe met juiste variabelen
-      ansible.builtin.include_role:
-        name: ibm.isam.set_oauth_client
-      loop: "{{ global_clients_parsed }}"
-      loop_control:
-        loop_var: client
