@@ -6,8 +6,8 @@ from ansible.module_utils.basic import AnsibleModule
 from datetime import datetime
 
 # Semaphore API Configuratie
-SEMAPHORE_URL = "http://192.168.242.133:3000/api"
-SEMAPHORE_TOKEN = "owozuup-zne7p-stkhhs3hdfr6efiyk1rh8okh_70bu="
+SEMAPHORE_URL = "http://192.168.242.160:3000/api"
+SEMAPHORE_TOKEN = "tuwnyelwoulicyww1e87zznnnaq7w6pkoadjh-z3uz8="
 PROJECT_ID = 1
 
 HEADERS = {
