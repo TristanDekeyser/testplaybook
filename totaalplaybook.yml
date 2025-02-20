@@ -3,6 +3,10 @@
   gather_facts: yes
   become: yes
 
+- name: Totaalverwerking van machines en variabelen
+  hosts: localhost
+  gather_facts: yes
+  become: yes
   vars:
     mislukte_variabelen: []
     mislukte_hosts: []
