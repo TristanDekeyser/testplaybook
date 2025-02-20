@@ -10,7 +10,7 @@ def transform_variable_name(original_name):
     if original_name.startswith("add_oauth_client_"):
         return original_name  # Geen wijziging nodig
 
-    if original_name.startswith("client_"):
+    if original_name.startswith("client"):
         return "add_oauth_" + original_name  # Alleen 'client_' vervangen door 'add_oauth_'
 
     return "add_oauth_client_" + original_name  # Standaard voorvoegsel toevoegen
