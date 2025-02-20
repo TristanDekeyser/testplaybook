@@ -65,7 +65,7 @@
       set_fact:
         global_clients_parsed: "{{ global_clients | map('from_yaml') | list }}"
 
-    - name: Voeg OAuth-clients toe met juiste variabelen
+    - name: Stel variabelen in en voeg OAuth-clients toe
       loop: "{{ global_clients_parsed }}"
       loop_control:
         loop_var: client
