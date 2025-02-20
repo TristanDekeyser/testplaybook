@@ -48,10 +48,10 @@
         clients: "{{ transformed_clients.results | map(attribute='transformed_vars') | list }}"
       when: git_pull_result.changed
 
-    - name: Bewaar de client-configuratie in een bestand
+    - name: Bewaar de client-configuratie in een YAML-bestand
       copy:
-        content: "{{ clients | to_json }}"
-        dest: /tmp/clients.json
+        content: "{{ clients | to_yaml }}"
+        dest: /tmp/clients.yml
 
 - name: Voeg OAuth-clients toe aan IBM ISAM
   hosts: isam
@@ -59,27 +59,10 @@
   tasks:
     - name: Laad getransformeerde clients in
       set_fact:
-        global_clients: "{{ lookup('file', '/tmp/clients.json') | from_json }}"
-
-    - name: Zet de variabelen correct per client
-      set_fact:
-        add_oauth_client_name: "{{ item.add_oauth_client_name }}"
-        add_oauth_client_definitionName: "{{ item.add_oauth_client_definitionName }}"
-        add_oauth_client_companyName: "{{ item.add_oauth_client_companyName }}"
-        add_oauth_client_redirectUri: "{{ item.add_oauth_client_redirectUri }}"
-        add_oauth_client_clientId: "{{ item.add_oauth_clientId }}"
-        add_oauth_client_clientSecret: "{{ item.add_oauth_clientSecret }}"
-        add_oauth_client_requirePkce: "{{ item.add_oauth_client_requirePkce }}"
-      loop: "{{ global_clients }}"
+        global_clients: "{{ lookup('file', '/tmp/clients.yml') | from_yaml }}"
 
     - name: Voeg OAuth-client toe met juiste variabelen
+      vars:
+        oauth_clients: "{{ global_clients }}"
       ansible.builtin.include_role:
         name: ibm.isam.add_oauth_client
-      vars:
-        add_oauth_client_name: "{{ add_oauth_client_name }}"
-        add_oauth_client_definitionName: "{{ add_oauth_client_definitionName }}"
-        add_oauth_client_companyName: "{{ add_oauth_client_companyName }}"
-        add_oauth_client_redirectUri: "{{ add_oauth_client_redirectUri }}"
-        add_oauth_client_clientId: "{{ add_oauth_client_clientId }}"
-        add_oauth_client_clientSecret: "{{ add_oauth_client_clientSecret }}"
-        add_oauth_client_requirePkce: "{{ add_oauth_client_requirePkce }}"

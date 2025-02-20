@@ -51,7 +51,10 @@ def main():
     if error:
         module.fail_json(msg=error)
 
-    module.exit_json(changed=True, transformed_vars=transformed_data)
+    # Exporteren naar YAML-formaat
+    yaml_data = yaml.dump(transformed_data, default_flow_style=False)
+
+    module.exit_json(changed=True, transformed_vars=yaml_data)
 
 if __name__ == "__main__":
     main()
