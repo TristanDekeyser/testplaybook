@@ -8,13 +8,13 @@ import re
 # Functie om variabelen om te zetten naar het juiste Ansible formaat
 def transform_variable_name(original_name):
     """Zet een originele variabelenaam om naar het Ansible formaat, met correcte behandeling van 'client_'."""
-    if original_name.startswith("add_oauth_client_"):
+    if original_name.startswith("set_oauth_client_"):
         return original_name  # Geen wijziging nodig
 
     if original_name.startswith("client_"):
-        return "add_oauth_" + original_name  # Alleen 'client_' vervangen door 'add_oauth_'
+        return "set_oauth_" + original_name  # Alleen 'client_' vervangen door 'add_oauth_'
 
-    return "add_oauth_client_" + original_name  # Standaard voorvoegsel toevoegen
+    return "set_oauth_client_" + original_name  # Standaard voorvoegsel toevoegen
 
 def rename_variables(data):
     """Herschrijft alle variabelen volgens het Ansible-formaat."""
