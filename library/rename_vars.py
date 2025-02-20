@@ -3,17 +3,24 @@
 from ansible.module_utils.basic import AnsibleModule
 import yaml
 import os
+import re
 
 # Functie om variabelen om te zetten naar het juiste Ansible formaat
 def transform_variable_name(original_name):
-    """Zet een originele variabelenaam om naar het Ansible formaat, met correcte behandeling van 'client_'."""
+    """Zet een originele variabelenaam om naar het Ansible formaat met underscores."""
+    name = original_name
     if original_name.startswith("add_oauth_client_"):
         return original_name  # Geen wijziging nodig
 
-    if original_name.startswith("client"):
-        return "add_oauth_" + original_name  # Alleen 'client_' vervangen door 'add_oauth_'
+    if original_name.startswith("client_"):
+        name = "add_oauth_" + original_name  # Alleen 'client_' vervangen door 'add_oauth_'
+    else:
+        name = "add_oauth_client_" + original_name
 
-    return "add_oauth_client_" + original_name  # Standaard voorvoegsel toevoegen
+    # Zet camelCase om naar snake_case
+    name = re.sub(r'([a-z])([A-Z])', r'\1_\2', name).lower()
+
+    return name
 
 def rename_variables(data):
     """Herschrijft alle variabelen volgens het Ansible-formaat."""
