@@ -65,6 +65,17 @@
       set_fact:
         global_clients_parsed: "{{ global_clients | map('from_yaml') | list }}"
 
+    - name: Haal de variabelen uit de lijst en stel ze in als afzonderlijke feiten
+      set_fact:
+        add_oauth_clientId: "{{ global_clients_parsed[0].add_oauth_client_clientId }}"
+        add_oauth_clientSecret: "{{ global_clients_parsed[0].add_oauth_client_clientSecret }}"
+        add_oauth_client_companyName: "{{ global_clients_parsed[0].add_oauth_client_companyName }}"
+        add_oauth_client_definitionName: "{{ global_clients_parsed[0].add_oauth_client_definitionName }}"
+        add_oauth_client_extProperties: "{{ global_clients_parsed[0].add_oauth_client_extProperties }}"
+        add_oauth_client_name: "{{ global_clients_parsed[0].add_oauth_client_name }}"
+        add_oauth_client_redirectUri: "{{ global_clients_parsed[0].add_oauth_client_redirectUri }}"
+        add_oauth_client_requirePkce: "{{ global_clients_parsed[0].add_oauth_client_requirePkce }}"
+
     - name: Voeg OAuth-client toe met juiste variabelen
       vars:
         oauth_clients: "{{ global_clients_parsed }}"
