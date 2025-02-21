@@ -28,6 +28,7 @@
       set_fact:
         created_files: "{{ git_diff_result.stdout_lines | select('search', '^A\\s+') | map('regex_replace', '^A\\s+', '') | list }}"
         updated_files: "{{ git_diff_result.stdout_lines | select('search', '^M\\s+') | map('regex_replace', '^M\\s+', '') | list }}"
+        deleted_files: "{{ git_diff_result.stdout_lines | select('search', '^D\\s+') | map('regex_replace', '^D\\s+', '') | list }}"
       when: git_pull_result.changed
 
     - name: Bepaal of er wijzigingen zijn
@@ -38,6 +39,17 @@
       copy:
         content: "{{ {'clients_changed': clients_changed} | to_yaml }}"
         dest: /tmp/clients_changed.yml
+
+    - name: Extraheer verwijderde clientnamen uit bestandsnamen
+      set_fact:
+        deleted_clients: "{{ deleted_files | map('regex_replace', '\\.yml$', '') | list }}"
+      when: git_pull_result.changed
+
+    - name: Sla verwijderde clients op in een YAML-bestand
+      copy:
+        content: "{{ deleted_clients | to_yaml }}"
+        dest: /tmp/deleted_clients.yml
+      when: git_pull_result.changed
 
     - name: Lees en transformeer variabelen voor gewijzigde bestanden
       rename_vars:
@@ -73,6 +85,10 @@
       set_fact:
         global_clients: "{{ lookup('file', '/tmp/clients.yml') | from_yaml }}"
 
+    - name: Lees de lijst van verwijderde clients uit het bestand
+      set_fact:
+        deleted_clients: "{{ lookup('file', '/tmp/deleted_clients.yml') | from_yaml }}"
+
     - name: Converteer de YAML-strings naar dictionaries
       set_fact:
         global_clients_parsed: "{{ global_clients | map('from_yaml') | list }}"
@@ -91,3 +107,18 @@
         set_oauth_client_name: "{{ client.set_oauth_client_name }}"
         set_oauth_client_redirectUri: "{{ client.set_oauth_client_redirectUri }}"
         set_oauth_client_requirePkce: "{{ client.set_oauth_client_requirePkce }}"
+
+    - name: Stop als er geen verwijderde clients zijn
+      meta: end_play
+      when: deleted_clients | length == 0
+
+    - name: Verwijder OAuth-client uit ISAM
+      ibm.isam.isam:
+        log: "{{ log_level | default('INFO') }}"
+        force: "{{ force | default(False) }}"
+        action: ibmsecurity.isam.aac.api_protection.clients.delete
+        isamapi:
+          name: "{{ client }}"
+      loop: "{{ deleted_clients }}"
+      loop_control:
+        loop_var: client
