@@ -42,7 +42,7 @@
 
     - name: Extraheer verwijderde clientnamen uit bestandsnamen
       set_fact:
-        deleted_clients: "{{ deleted_files | map('regex_replace', '\\.yml$', '') | list }}"
+        deleted_clients: "{{ deleted_files | map('basename') | map('regex_replace', '\\.yml$', '') | list }}"
       when: git_pull_result.changed
 
     - name: Sla verwijderde clients op in een YAML-bestand
