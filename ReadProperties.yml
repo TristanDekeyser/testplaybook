@@ -69,7 +69,7 @@
         dest: /tmp/clients.yml
       when: git_pull_result.changed
 
-- name: Voeg OAuth-clients toe aan IBM ISAM
+- name: Voeg (of verwijder) OAuth-clients toe aan IBM ISAM
   hosts: isam
   gather_facts: no
   tasks:
@@ -107,6 +107,7 @@
         set_oauth_client_name: "{{ client.set_oauth_client_name }}"
         set_oauth_client_redirectUri: "{{ client.set_oauth_client_redirectUri }}"
         set_oauth_client_requirePkce: "{{ client.set_oauth_client_requirePkce }}"
+      when: global_clients_parsed | length > 0
 
     - name: Stop als er geen verwijderde clients zijn
       meta: end_play
