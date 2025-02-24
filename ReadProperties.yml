@@ -92,7 +92,7 @@
       ibm.isam.isam:
         log: "{{ log_level | default(omit) }}"
         force: "{{ force | default(omit) }}"
-        action: ibmsecurity.isam.appliance.commit_and_restart_and_wait
+        action: ibmsecurity.isam.appliance.commit
         timeout: 120
       when: global_clients | length > 0
 
