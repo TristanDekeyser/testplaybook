@@ -88,7 +88,7 @@
         set_oauth_client_requirePkce: "{{ client.set_oauth_client_requirePkce }}"
       when: global_clients | length > 0
 
-    - name: Commit Changes and Restart
+    - name: Commit Changes(create & update)
       ibm.isam.isam:
         log: "{{ log_level | default(omit) }}"
         force: "{{ force | default(omit) }}"
@@ -109,3 +109,9 @@
       loop: "{{ deleted_clients }}"
       loop_control:
         loop_var: client
+
+    - name: Commit Changes(delete)
+      ibm.isam.isam:
+        log: "{{ log_level | default(omit) }}"
+        force: "{{ force | default(omit) }}"
+        action: ibmsecurity.isam.appliance.commit
