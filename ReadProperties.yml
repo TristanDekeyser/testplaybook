@@ -93,7 +93,6 @@
         log: "{{ log_level | default(omit) }}"
         force: "{{ force | default(omit) }}"
         action: ibmsecurity.isam.appliance.commit
-        timeout: 120
       when: global_clients | length > 0
 
     - name: Stop als er geen verwijderde clients zijn
