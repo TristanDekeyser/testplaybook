@@ -90,6 +90,12 @@
         set_oauth_client_requirePkce: "{{ client.set_oauth_client_requirePkce }}"
       when: global_clients | length > 0
 
+    - name: Trigger handler als er clients zijn toegevoegd
+      ansible.builtin.debug:
+        msg: "Clients zijn toegevoegd, commit de wijzigingen."
+      when: global_clients_parsed | length > 0
+      notify: Commit Changes
+
     - name: Stop als er geen verwijderde clients zijn
       meta: end_play
       when: deleted_clients | length == 0
