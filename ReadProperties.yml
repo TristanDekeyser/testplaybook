@@ -31,24 +31,9 @@
         deleted_files: "{{ git_diff_result.stdout_lines | select('search', '^D\\s+') | map('regex_replace', '^D\\s+', '') | list }}"
       when: git_pull_result.changed
 
-    - name: Bepaal of er wijzigingen zijn
-      set_fact:
-        clients_changed: "{{ git_pull_result.changed }}"
-
-    - name: Sla de wijzigingsstatus op
-      copy:
-        content: "{{ {'clients_changed': clients_changed} | to_yaml }}"
-        dest: /tmp/clients_changed.yml
-
     - name: Extraheer verwijderde clientnamen uit bestandsnamen
       set_fact:
         deleted_clients: "{{ deleted_files | map('basename') | map('regex_replace', '\\.yml$', '') | list }}"
-      when: git_pull_result.changed
-
-    - name: Sla verwijderde clients op in een YAML-bestand
-      copy:
-        content: "{{ deleted_clients | to_yaml }}"
-        dest: /tmp/deleted_clients.yml
       when: git_pull_result.changed
 
     - name: Lees en transformeer variabelen voor gewijzigde bestanden
@@ -58,45 +43,35 @@
       loop: "{{ created_files + updated_files }}"
       when: git_pull_result.changed
 
-    - name: Sla getransformeerde clients op
+    - name: Sla getransformeerde clients op als fact
       set_fact:
         clients: "{{ transformed_clients.results | map(attribute='transformed_vars') | list }}"
-      when: git_pull_result.changed
-
-    - name: Bewaar de client-configuratie in een YAML-bestand
-      copy:
-        content: "{{ clients | to_yaml }}"
-        dest: /tmp/clients.yml
       when: git_pull_result.changed
 
 - name: Voeg (of verwijder) OAuth-clients toe aan IBM ISAM
   hosts: isam
   gather_facts: no
   tasks:
-    - name: Lees de wijzigingsstatus uit bestand
+    - name: Controleer of er wijzigingen zijn
       set_fact:
-        clients_status: "{{ lookup('file', '/tmp/clients_changed.yml') | from_yaml }}"
+        clients_changed: "{{ hostvars['localhost']['git_pull_result'].changed | default(false) }}"
 
     - name: Stop als er geen wijzigingen zijn
       meta: end_play
-      when: not clients_status.clients_changed | default(false)
+      when: not clients_changed
 
     - name: Laad getransformeerde clients in
       set_fact:
-        global_clients: "{{ lookup('file', '/tmp/clients.yml') | from_yaml }}"
+        global_clients: "{{ hostvars['localhost']['clients'] | default([]) }}"
 
-    - name: Lees de lijst van verwijderde clients uit het bestand
+    - name: Lees de lijst van verwijderde clients
       set_fact:
-        deleted_clients: "{{ lookup('file', '/tmp/deleted_clients.yml') | from_yaml }}"
-
-    - name: Converteer de YAML-strings naar dictionaries
-      set_fact:
-        global_clients_parsed: "{{ global_clients | map('from_yaml') | list }}"
+        deleted_clients: "{{ hostvars['localhost']['deleted_clients'] | default([]) }}"
 
     - name: Voeg OAuth-client toe met juiste variabelen
       ansible.builtin.include_role:
         name: ibm.isam.set_oauth_client
-      loop: "{{ global_clients_parsed }}"
+      loop: "{{ global_clients }}"
       loop_control:
         loop_var: client
       vars:
@@ -107,7 +82,7 @@
         set_oauth_client_name: "{{ client.set_oauth_client_name }}"
         set_oauth_client_redirectUri: "{{ client.set_oauth_client_redirectUri }}"
         set_oauth_client_requirePkce: "{{ client.set_oauth_client_requirePkce }}"
-      when: global_clients_parsed | length > 0
+      when: global_clients | length > 0
 
     - name: Stop als er geen verwijderde clients zijn
       meta: end_play
