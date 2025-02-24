@@ -76,6 +76,8 @@
       ansible.builtin.include_role:
         name: ibm.isam.set_oauth_client
       loop: "{{ global_clients_parsed }}"
+      notify:
+        - Commit Changes
       loop_control:
         loop_var: client
       vars:
