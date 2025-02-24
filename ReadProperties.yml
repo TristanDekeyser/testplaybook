@@ -64,6 +64,10 @@
       set_fact:
         global_clients: "{{ hostvars['localhost']['clients'] | default([]) }}"
 
+    - name: Converteer de YAML-strings naar dictionaries
+      set_fact:
+        global_clients_parsed: "{{ global_clients | map('from_yaml') | list }}"
+
     - name: Lees de lijst van verwijderde clients
       set_fact:
         deleted_clients: "{{ hostvars['localhost']['deleted_clients'] | default([]) }}"
@@ -71,7 +75,7 @@
     - name: Voeg OAuth-client toe met juiste variabelen
       ansible.builtin.include_role:
         name: ibm.isam.set_oauth_client
-      loop: "{{ global_clients }}"
+      loop: "{{ global_clients_parsed }}"
       loop_control:
         loop_var: client
       vars:
