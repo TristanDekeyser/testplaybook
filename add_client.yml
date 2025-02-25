@@ -24,4 +24,4 @@
         add_oauth_client_encryptionDb: "{{ encryptionDb | default(omit) }}"
         add_oauth_client_encryptionCert: "{{ encryptionCert | default(omit) }}"
         add_oauth_client_jwksUri: "{{ jwksUri | default(omit) }}"
-        # add_oauth_client_extProperties: "{{ extProperties | default(omit) }}"
+        add_oauth_client_extProperties: "{{ extProperties | default(omit) }}"
