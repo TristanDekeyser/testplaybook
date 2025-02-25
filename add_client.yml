@@ -3,6 +3,9 @@
   gather_facts: no
 
   tasks:
+    - name: debug
+      debug:
+        msg: "{{ clientId }}"
     - name: "add oauth client"
       ansible.builtin.include_role:
         name: ibm.isam.add_oauth_client
