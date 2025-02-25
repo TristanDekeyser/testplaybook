@@ -11,7 +11,7 @@
         # Dynamisch de variabelen instellen alleen als ze gedefinieerd zijn
         add_oauth_client_clientId: "{{ clientId | default(omit) }}"
         add_oauth_client_clientSecret: "{{ clientSecret | default(omit) }}"
-        add_oauth_client_companyName: "{{ companyName | default(add_oauth_client_companyName) }}"
+        add_oauth_client_companyName: "{{ companyName | default(omit) }}"
         add_oauth_client_definitionName: "{{ definitionName | default(omit) }}"
         add_oauth_client_name: "{{ client_name | default(omit) }}"
         add_oauth_client_redirectUri: "{{ redirectUri | default(omit) }}"
