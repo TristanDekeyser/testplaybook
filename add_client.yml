@@ -1,14 +1,13 @@
----
 - name: Voeg een OAuth-client toe aan IBM ISAM
   hosts: isam
   gather_facts: no
 
   tasks:
-    - name: "add 0authclient"
+    - name: "add oauth client"
       ansible.builtin.include_role:
         name: ibm.isam.add_oauth_client
       vars:
-        # Dynamisch de variabelen instellen alleen als ze gedefinieerd zijn
+        # Use omit only if the variable is undefined
         add_oauth_client_clientId: "{{ clientId | default(omit) }}"
         add_oauth_client_clientSecret: "{{ clientSecret | default(omit) }}"
         add_oauth_client_companyName: "{{ companyName | default(omit) }}"
