@@ -1,0 +1,9 @@
+---
+- name: Voeg een OAuth-client toe aan IBM ISAM
+  hosts: isam
+  gather_facts: no
+
+  tasks:
+    - name: "add 0authclient"
+      ansible.builtin.include_role:
+        name: ibm.isam.add_oauth_client
